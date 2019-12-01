@@ -1,32 +1,24 @@
 package Data;
 
-import com.github.javaparser.ParseResult;
+import SpringApplication.GraphApplication;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.PackageDeclaration;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.javaparser.Navigator;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import com.github.javaparser.utils.SourceRoot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.instrument.ClassDefinition;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 public class DataGuide {
 
@@ -45,7 +37,7 @@ public class DataGuide {
 
     private static Map<String,Map<String,Integer>> twoPackagesAndWeight;
     private static Map<String,String> classAndPackage;
-    private static Map<String,ArrayList<String>> classAndMethods;
+    private static Map<String, ArrayList<String>> classAndMethods;
     private static Map<String,String> methodAndPackageName;
     private static Set<String> listOfDeclaredMethods;
     private static Map<String,String> packagePackage;
@@ -81,6 +73,7 @@ public class DataGuide {
         filesWeight = new HashMap<>();
         classesNames = new ArrayList<>();
 
+
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
             checkDirectory(file, clasesFiles);
         });
@@ -93,6 +86,8 @@ public class DataGuide {
         FilesConnections();
     }
 
+    GraphApplication graphApplication = new GraphApplication();
+    // Historyjka 1
     // Połączenia pomiędzy plikami zwracamy mape <nazwa pliku1,<nazwa pliku2, waga pliku>>
     public Map<String, Map<String,Integer>> FilesConnections(){
         Map<String, Map<String, Integer>> filesInformation = new HashMap<>();
@@ -103,6 +98,16 @@ public class DataGuide {
             int fileWeigth = (int)file.length();
             weigth.add(fileWeigth);
 
+            CompilationUnit cu = null;
+            try {
+                cu = StaticJavaParser.parse(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            for(ImportDeclaration id : cu.getImports() ){
+                System.out.println("File name: " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + " Imports: " + id.getName().asString());
+            }
 
         });
 

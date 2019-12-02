@@ -1,11 +1,8 @@
 package Data;
-
 import SpringApplication.GraphApplication;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
@@ -28,20 +25,9 @@ public class DataGuide {
     private CombinedTypeSolver combinedTypeSolver;
     private File mainFile;
 
-    //Set z wszystkimi plikami
     private static Set<File> clasesFiles;
-
-    //new
-    private static Map<String,Integer> filesWeight;
     private static List<String> classesNames;
-
-    private static Map<String,Map<String,Integer>> twoPackagesAndWeight;
-    private static Map<String,String> classAndPackage;
-    private static Map<String, ArrayList<String>> classAndMethods;
-    private static Map<String,String> methodAndPackageName;
-    private static Set<String> listOfDeclaredMethods;
-    private static Map<String,String> packagePackage;
-    private static Map<String,Integer> methodWeight;
+    private static Map<String,Integer> filesWeight;
 
 
     public void findModuleDependencies(String rootPath) throws IOException, ClassNotFoundException, NoSuchFieldException {
@@ -61,18 +47,9 @@ public class DataGuide {
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
-        twoPackagesAndWeight = new HashMap<>();
         clasesFiles = new HashSet<>();
-        listOfDeclaredMethods = new HashSet<>();
-        packagePackage = new HashMap<>();
-        classAndMethods = new HashMap<>();
-        classAndPackage = new HashMap<>();
-        methodWeight = new HashMap<>();
-
-        //new
-        filesWeight = new HashMap<>();
         classesNames = new ArrayList<>();
-
+        filesWeight = new HashMap<>();
 
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
             checkDirectory(file, clasesFiles);
@@ -82,18 +59,18 @@ public class DataGuide {
             classesNames.add(file.getName().substring(0,file.getName().lastIndexOf(".java")));
         });
 
-        // PackageInformation();
         FilesConnections();
     }
-
-    GraphApplication graphApplication = new GraphApplication();
     // Historyjka 1
-    // Połączenia pomiędzy plikami zwracamy mape <nazwa pliku1,<nazwa pliku2, waga pliku>>
+    // Połączenia pomiędzy plikami
+
     public Map<String, Map<String,Integer>> FilesConnections(){
+
         Map<String, Map<String, Integer>> filesInformation = new HashMap<>();
         List<Integer> weigth = new ArrayList<>();
 
         clasesFiles.forEach(file -> {
+
             String firstFileName = file.getName().substring(0,file.getName().lastIndexOf(".java"));
             int fileWeigth = (int)file.length();
             weigth.add(fileWeigth);
@@ -106,7 +83,14 @@ public class DataGuide {
             }
 
             for(ImportDeclaration id : cu.getImports() ){
-                System.out.println("File name: " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + " Imports: " + id.getName().asString());
+               // System.out.println("File name: " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + " Imports: " + id.getName().getIdentifier());
+            }
+
+            for(MethodCallExpr mce : cu.findAll(MethodCallExpr.class)){
+                    if(classesNames.contains(mce.resolve().getClassName())){
+
+                        System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t Weight File One: " + fileWeigth + "\t File two : " + mce.resolve().getClassName() + "\t Method from file two : " + mce.resolve().getName() );
+                    }
             }
 
         });
@@ -114,31 +98,13 @@ public class DataGuide {
         return filesInformation;
     }
 
-
-    public Map<String, Map<String, Integer>> PackageInformation(){
-        Map<String, Map<String, Integer>> packageInformation = new HashMap<>();
-
-        clasesFiles.forEach( file -> {
-            CompilationUnit u  = null;
-            try{
-                u = StaticJavaParser.parse(file);
-
-            }catch (FileNotFoundException e){
-                System.out.println(e.fillInStackTrace());
-            }
-
-            u.findAll(MethodDeclaration.class).stream().forEach(obj -> {
-                listOfDeclaredMethods.add(obj.resolve().getClassName());
-            });
-            new MethodVisitor().visit(u,null);
-
-        });
-
-        classAndPackage.keySet().retainAll(listOfDeclaredMethods);
-
-        System.out.println(classAndPackage);
-        System.out.println(methodWeight);
-        return packageInformation;
+        public static class MethodExprVisitor extends VoidVisitorAdapter
+    {
+        @Override
+        public void visit(MethodCallExpr n, Object arg)
+        {
+            super.visit(n,arg);
+        }
 
     }
 
@@ -157,49 +123,8 @@ public class DataGuide {
         }
     }
 
-    public static class MethodExprVisitor extends VoidVisitorAdapter
-    {
-        @Override
-        public void visit(MethodCallExpr n, Object arg)
-        {
-            super.visit(n,arg);
-        }
-
-    }
-    public static class MethodVisitor extends VoidVisitorAdapter
-    {
-        @Override
-        public void visit(MethodDeclaration n, Object arg)
-        {
-            super.visit(n,arg);
-            n.findAll(MethodCallExpr.class).stream().forEach(obj ->{
-                System.out.println("Paczka 1: " + n.resolve().getPackageName() +" | Klasa paczki 1: " + n.resolve().getClassName() + " |  Nazwa metody 1: " + n.getNameAsString() + " |  Nazwa metody 2: " + obj.getNameAsString() + " |  Nazwa Paczki metody 2: " + obj.resolve().getPackageName() +"Klasa paczki 2: " + obj.resolve().getClassName() );
-
-                if(methodWeight.containsKey(n.getNameAsString())){
-                    methodWeight.replace(n.getNameAsString(),methodWeight.get(n.getNameAsString()) + 1);
-                }
-                else if(methodWeight.containsKey(obj.getNameAsString())){
-                    methodWeight.replace(obj.getNameAsString(),methodWeight.get(obj.getNameAsString()) + 1);
-                }
-                else{
-                    methodWeight.put(n.getNameAsString(),1);
-                    methodWeight.put(obj.getNameAsString(),1);
-                }
-
-                classAndPackage.put(n.resolve().getClassName(),n.resolve().getPackageName());
-                classAndPackage.put(obj.resolve().getClassName(),obj.resolve().getPackageName());
 
 
-            });
-        }
-    }
-    public static class ClassName extends VoidVisitorAdapter
-    {
-        @Override
-        public void visit(ClassOrInterfaceDeclaration n, Object arg)
-        {
-            super.visit(n,arg);
-        }
-    }
+
 }
 

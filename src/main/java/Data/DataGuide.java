@@ -83,12 +83,13 @@ public class DataGuide {
             }
 
             for(ImportDeclaration id : cu.getImports() ){
-               // System.out.println("File name: " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + " Imports: " + id.getName().getIdentifier());
+                if(classesNames.contains(id.getName().getIdentifier())){
+                    System.out.println("File name: " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + " Imports: " + id.getName().getIdentifier());
+                }
             }
 
             for(MethodCallExpr mce : cu.findAll(MethodCallExpr.class)){
                     if(classesNames.contains(mce.resolve().getClassName())){
-
                         System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t Weight File One: " + fileWeigth + "\t File two : " + mce.resolve().getClassName() + "\t Method from file two : " + mce.resolve().getName() );
                     }
             }
@@ -98,15 +99,7 @@ public class DataGuide {
         return filesInformation;
     }
 
-        public static class MethodExprVisitor extends VoidVisitorAdapter
-    {
-        @Override
-        public void visit(MethodCallExpr n, Object arg)
-        {
-            super.visit(n,arg);
-        }
 
-    }
 
     private void checkDirectory (File file, Set<File> list){
         if(file.isDirectory()){

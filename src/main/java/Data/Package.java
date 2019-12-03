@@ -9,6 +9,10 @@ public class Package {
         this.size = size;
     }
 
+    public Package(String packageName) {
+        this.packageName = packageName;
+    }
+
     public String getPackageName() {
         return packageName;
     }

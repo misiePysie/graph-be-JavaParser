@@ -12,6 +12,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import sun.security.krb5.internal.PAData;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,16 +33,16 @@ public class DataGuide {
     private static Set<File> clasesFiles;
     private static List<String> classesNames;
     private static List<String> methodsNames;
-    private static Map<String,Integer> filesWeight;
-    private static Map<String,Integer> methodsWeight;
-    private static Map<String,Map<String,Integer>> fileOneFileTwoWeight;
-    private static Map<String,Map<String,Integer>> methodOneMethodTwoWeight;
-    private static Map<String,Map<String,Integer>> moduleOneModuleTwoWeight;
-    private static Map<String,Map<String,Integer>> methodAndModuleWeight;
-    private static Map<String,Map<String,Integer>> methodAndModuleWeightOne;
-    private static Map<String,Map<String,Integer>> methodAndModuleWeightTwo;
+    private static HashMap<String,Integer> filesWeight;
+    private static HashMap<String,Integer> methodsWeight;
+    private static HashMap<String,HashMap<String,Integer>> fileOneFileTwoWeight;
+    private static HashMap<String,HashMap<String,Integer>> methodOneMethodTwoWeight;
+    private static HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight;
+    private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeight;
+    private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightOne;
+    private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightTwo;
 
-    public void findModuleDependencies(String rootPath) throws IOException, ClassNotFoundException, NoSuchFieldException {
+    public void findModuleDependencies(String rootPath,AllData allData) throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.combinedTypeSolver = new CombinedTypeSolver();
         this.typeSolver = new JavaParserTypeSolver(rootPath);
@@ -48,12 +50,12 @@ public class DataGuide {
         reflectionTypeSolver = new ReflectionTypeSolver();
         combinedTypeSolver.add(reflectionTypeSolver);
         combinedTypeSolver.add(typeSolver);
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-logic-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/gson-2.8.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-logic-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/gson-2.8.2.jar"));
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
@@ -79,9 +81,9 @@ public class DataGuide {
 
 
 
-//     FilesConnections();
+//     FilesConnections(allData);
 //     MethodConnections();
-     ModuleConnections();
+     ModuleConnections(allData);
 
 
     }
@@ -90,7 +92,7 @@ public class DataGuide {
     // Połączenia pomiędzy plikami File_File
 
 
-    public Map<String, Map<String,Integer>> FilesConnections(){
+    public HashMap<String, HashMap<String,Integer>> FilesConnections(AllData allData){
         //stworzenie listy plików;
         final ArrayList<JavaFile> listOfJavaFiles=new ArrayList<JavaFile>();
         addAllFilesToList(listOfJavaFiles);
@@ -138,15 +140,16 @@ public class DataGuide {
             }
             addAllEdgesToList(listOfEdgesFile_File,listOfJavaFiles,tempOneJavaFile,fileTwoAndWeight);
 
+
         });
-
-        //todo: Dla Norbiego do przekazania chlopakom: listOfEdgesFile_File,listOfJavaFiles
-
+        allData.setListOfJavaFiles(listOfJavaFiles);
+        allData.setListOfEdgesFile_File(listOfEdgesFile_File);
         return fileOneFileTwoWeight;
     }
-    public void setSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
+    public void setJavaFilesSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
     {
         double max=-1;
+
         int index=-1;
         for (int i = 0; i< listOfJavaFiles.size(); i++)
         {
@@ -183,14 +186,14 @@ public class DataGuide {
                     listOfJavaFiles.add(javaFile);
                 });
         //ustawienie wartosci pod kolka
-        setSizeForCircles(listOfJavaFiles);
+        setJavaFilesSizeForCircles(listOfJavaFiles);
 
         listOfJavaFiles.forEach(f-> System.out.println(f));
     }
     //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
     // Połączenia pomiędzy metodami
-    public Map<String, Map<String,Integer>> MethodConnections(){
+    public HashMap<String, HashMap<String,Integer>> MethodConnections(){
 
         clasesFiles.forEach(file -> {
             CompilationUnit cu = null;
@@ -200,7 +203,7 @@ public class DataGuide {
                 e.printStackTrace();
             }
             for(MethodDeclaration md : cu.findAll(MethodDeclaration.class)){
-                Map<String,Integer> methodTwoAndWeight = new HashMap<>();
+                HashMap<String,Integer> methodTwoAndWeight = new HashMap<>();
                 for(MethodCallExpr mce : md.findAll(MethodCallExpr.class)){
                     if(classesNames.contains(mce.resolve().getClassName())){
                         if(methodsWeight.containsKey(mce.resolve().getName())){
@@ -230,17 +233,24 @@ public class DataGuide {
     }
     // Historyjka 3
     // Połączenia pomiędzy metodami
-    public Map<String, Map<String,Integer>> ModuleConnections(){
+    public HashMap<String, HashMap<String,Integer>> ModuleConnections(AllData allData){
+        ArrayList<Package> listOfPackages=new ArrayList<>();
+
+        addListOfPackages(listOfPackages);
+
+
         clasesFiles.forEach(file -> {
+
             CompilationUnit cu = null;
             try {
                 cu = StaticJavaParser.parse(file);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            Map<String,Integer> moduleTwoAndWeight = new HashMap<>();
-            Map<String,Integer> methodTwoAndWeight = new HashMap<>();
-            Map<String,Integer> methodTwoAndWeightSecond = new HashMap<>();
+
+            HashMap<String,Integer> moduleTwoAndWeight = new HashMap<>();
+            HashMap<String,Integer> methodTwoAndWeight = new HashMap<>();
+            HashMap<String,Integer> methodTwoAndWeightSecond = new HashMap<>();
             for(MethodDeclaration md : cu.findAll(MethodDeclaration.class)){
                 for(MethodCallExpr mce : md.findAll(MethodCallExpr.class)){
                     if(classesNames.contains(mce.resolve().getClassName())){
@@ -273,8 +283,11 @@ public class DataGuide {
 
                     }
                 }
+
             }
+
         });
+
         for(String key: methodAndModuleWeightOne.keySet() ){
                 if(methodAndModuleWeightTwo.containsKey(key)){
                     methodAndModuleWeightTwo.get(key).forEach((k, v) -> methodAndModuleWeightOne.get(key).merge(k, v, Integer::sum));
@@ -285,10 +298,73 @@ public class DataGuide {
         methodAndModuleWeight.putAll(methodAndModuleWeightOne);
         // methodAndModuleWeight mapa zawierająca <Paczka,<Metoda,wagakrawedzi>>
         // moduleOneModuleTwoWeight mapa zawierajaca<Paczka1,<Paczka2, waga krawedzi>>
-        System.out.println(methodAndModuleWeight);
-        System.out.println(moduleOneModuleTwoWeight);
+        System.out.println( "Method_Module: "+methodAndModuleWeight);
+        System.out.println("Module_Module:"+moduleOneModuleTwoWeight);
+
+
+       // setPackagesSizeForCircles(listOfPackages);
+       // listOfPackages.forEach(x-> System.out.println(x));
+
+
 
         return moduleOneModuleTwoWeight;
+    }
+    public void setPackagesSizeForCircles(ArrayList<Package> listOfPackages)
+    {
+        int max=-1;
+        int index=0;
+        for (int i = 0; i< listOfPackages.size(); i++)
+        {
+            if(listOfPackages.get(i).getSize()>max) {
+                max = listOfPackages.get(i).getSize();
+                index = i;
+            }
+        }
+        listOfPackages.get(index).setSize(500);
+        int val=0;
+        for(int i = 0; i< listOfPackages.size(); i++)
+        {
+            val=(listOfPackages.get(i).getSize()*500)/max;
+            listOfPackages.get(i).setSize(val);
+        }
+
+    }
+    public void addAllEdgesPackage_PackagesToList(ArrayList<Package> listOfPackages,ArrayList<EdgePackage_Package> listOfEdgesPackage_Package,HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight)
+    {
+        EdgePackage_Package edgePackage_package;
+        Iterator firstIterator=moduleOneModuleTwoWeight.entrySet().iterator();
+        Iterator secondIterator;
+        while(firstIterator.hasNext()){
+            Map.Entry mapElement=(Map.Entry)firstIterator.next();
+            //Map.Entry mapInsideElement=(Map.Entry)
+
+         // edgePackage_package=new EdgePackage_Package(mapElement.getKey().toString(),mapElement.getValue().toString());
+        }
+       // Package p=new Package(moduleOneModuleTwoWeight.ge)
+    }
+    public void addListOfPackages(ArrayList<Package> listOfPackages)
+    {
+
+        clasesFiles.forEach(file -> {
+            boolean isAlreadyAtList=false;
+            int ppackageWeight = (int) file.getParentFile().length();
+            //   weight.add(fileWeight);
+            Package aPackage = new Package(file.getParentFile().getName(), ppackageWeight);
+
+
+            //if(!listOfPackages.contains(aPackage)) listOfPackages.add(aPackage);
+          //  System.out.println(aPackage);
+            for (Package p : listOfPackages) {
+                if (p.getPackageName().equals(aPackage.getPackageName())) {
+                    isAlreadyAtList = true;
+                }
+            }
+            if (!isAlreadyAtList){
+                listOfPackages.add(aPackage);
+            }
+        });
+
+        listOfPackages.forEach(x-> System.out.println(x));
     }
 
 

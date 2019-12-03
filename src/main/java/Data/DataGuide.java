@@ -33,7 +33,8 @@ public class DataGuide {
     private static Map<String,Integer> methodsWeight;
     private static Map<String,Map<String,Integer>> fileOneFileTwoWeight;
     private static Map<String,Map<String,Integer>> methodOneMethodTwoWeight;
-
+    private static Map<String,Map<String,Integer>> moduleOneModuleTwoWeight;
+    private static Map<String,Map<String,Integer>> methodAndModuleWeight;
 
     public void findModuleDependencies(String rootPath) throws IOException, ClassNotFoundException, NoSuchFieldException {
 
@@ -59,6 +60,8 @@ public class DataGuide {
         fileOneFileTwoWeight = new HashMap<>();
         methodOneMethodTwoWeight = new HashMap<>();
         methodsWeight = new HashMap<>();
+        moduleOneModuleTwoWeight = new HashMap<>();
+        methodAndModuleWeight = new HashMap<>();
 
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
 
@@ -71,8 +74,9 @@ public class DataGuide {
 
 
 
-        FilesConnections();
-        //MethodConnections();
+//      FilesConnections();
+//      MethodConnections();
+        ModuleConnections();
 
 
     }
@@ -180,7 +184,7 @@ public class DataGuide {
     }
     //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
-    // Połączenia pomiędzy plikami
+    // Połączenia pomiędzy metodami
     public Map<String, Map<String,Integer>> MethodConnections(){
 
         clasesFiles.forEach(file -> {
@@ -218,6 +222,65 @@ public class DataGuide {
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
         return methodOneMethodTwoWeight;
+    }
+    // Historyjka 3
+    // Połączenia pomiędzy metodami
+    public Map<String, Map<String,Integer>> ModuleConnections(){
+        clasesFiles.forEach(file -> {
+            CompilationUnit cu = null;
+            try {
+                cu = StaticJavaParser.parse(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            Map<String,Integer> moduleTwoAndWeight = new HashMap<>();
+            Map<String,Integer> methodTwoAndWeight = new HashMap<>();
+            Map<String,Integer> methodTwoAndWeightSecond = new HashMap<>();
+            for(MethodDeclaration md : cu.findAll(MethodDeclaration.class)){
+                for(MethodCallExpr mce : md.findAll(MethodCallExpr.class)){
+                    if(classesNames.contains(mce.resolve().getClassName())){
+                        if(!moduleTwoAndWeight.containsKey(mce.resolve().getPackageName())){
+                            moduleTwoAndWeight.put(mce.resolve().getPackageName(),1);
+                        }
+                        else{
+                            int value = moduleTwoAndWeight.get(mce.resolve().getPackageName()) + 1;
+                            moduleTwoAndWeight.put(mce.resolve().getPackageName(),value);
+                        }
+                        //
+                        if(!methodTwoAndWeight.containsKey(mce.resolve().getName())){
+                            methodTwoAndWeight.put(mce.resolve().getName(),1);
+                        }
+                        else{
+                            int value = methodTwoAndWeight.get(mce.resolve().getName()) + 1;
+                            methodTwoAndWeight.put(mce.resolve().getName(),value);
+                        }
+
+                        if(!methodTwoAndWeightSecond.containsKey(md.resolve().getName())){
+                            methodTwoAndWeightSecond.put(md.resolve().getName(),1);
+                        }
+                        else{
+                            int value = methodTwoAndWeightSecond.get(md.resolve().getName()) + 1;
+                            methodTwoAndWeightSecond.put(md.resolve().getName(),value);
+                        }
+
+                        moduleOneModuleTwoWeight.put(md.resolve().getPackageName(),moduleTwoAndWeight);
+//                        System.out.println();
+//                        System.out.print("Paczka 1: " + md.resolve().getPackageName()  + "\tMetoda 1:" + md.resolve().getName());
+//                        System.out.println("\tPaczka 2: " + mce.resolve().getPackageName() + "\tMetoda 2:" + mce.resolve().getName());
+//                        System.out.print("-----Paczka 1: " +md.resolve().getPackageName() +"\tMetoda1: " + methodTwoAndWeightSecond);
+//                        System.out.println("\t-----Paczka 2: " +mce.resolve().getPackageName() +"\tMetoda2: " + methodTwoAndWeight);
+//
+//                        methodTwoAndWeight.forEach((k, v) -> methodTwoAndWeightSecond.merge(k, v, Integer::sum));
+//                        System.out.println(methodTwoAndWeightSecond);
+                    }
+
+
+                }
+            }
+        });
+//        System.out.println(methodAndModuleWeight);
+        //System.out.println(moduleOneModuleTwoWeight);
+        return moduleOneModuleTwoWeight;
     }
 
 

@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class DataGuide {
@@ -35,6 +37,8 @@ public class DataGuide {
     private static Map<String,Map<String,Integer>> methodOneMethodTwoWeight;
     private static Map<String,Map<String,Integer>> moduleOneModuleTwoWeight;
     private static Map<String,Map<String,Integer>> methodAndModuleWeight;
+    private static Map<String,Map<String,Integer>> methodAndModuleWeightOne;
+    private static Map<String,Map<String,Integer>> methodAndModuleWeightTwo;
 
     public void findModuleDependencies(String rootPath) throws IOException, ClassNotFoundException, NoSuchFieldException {
 
@@ -44,12 +48,12 @@ public class DataGuide {
         reflectionTypeSolver = new ReflectionTypeSolver();
         combinedTypeSolver.add(reflectionTypeSolver);
         combinedTypeSolver.add(typeSolver);
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-logic-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/gson-2.8.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-logic-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/gson-2.8.2.jar"));
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
@@ -61,8 +65,9 @@ public class DataGuide {
         methodOneMethodTwoWeight = new HashMap<>();
         methodsWeight = new HashMap<>();
         moduleOneModuleTwoWeight = new HashMap<>();
+        methodAndModuleWeightOne = new HashMap<>();
+        methodAndModuleWeightTwo = new HashMap<>();
         methodAndModuleWeight = new HashMap<>();
-
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
 
             checkDirectory(file, clasesFiles);
@@ -74,9 +79,9 @@ public class DataGuide {
 
 
 
-     FilesConnections();
-//      MethodConnections();
-//        ModuleConnections();
+//     FilesConnections();
+//     MethodConnections();
+     ModuleConnections();
 
 
     }
@@ -246,7 +251,7 @@ public class DataGuide {
                             int value = moduleTwoAndWeight.get(mce.resolve().getPackageName()) + 1;
                             moduleTwoAndWeight.put(mce.resolve().getPackageName(),value);
                         }
-                        //
+
                         if(!methodTwoAndWeight.containsKey(mce.resolve().getName())){
                             methodTwoAndWeight.put(mce.resolve().getName(),1);
                         }
@@ -262,24 +267,27 @@ public class DataGuide {
                             int value = methodTwoAndWeightSecond.get(md.resolve().getName()) + 1;
                             methodTwoAndWeightSecond.put(md.resolve().getName(),value);
                         }
-
+                        methodAndModuleWeightTwo.put(mce.resolve().getPackageName(),methodTwoAndWeight);
+                        methodAndModuleWeightOne.put(md.resolve().getPackageName(),methodTwoAndWeightSecond);
                         moduleOneModuleTwoWeight.put(md.resolve().getPackageName(),moduleTwoAndWeight);
-//                        System.out.println();
-//                        System.out.print("Paczka 1: " + md.resolve().getPackageName()  + "\tMetoda 1:" + md.resolve().getName());
-//                        System.out.println("\tPaczka 2: " + mce.resolve().getPackageName() + "\tMetoda 2:" + mce.resolve().getName());
-//                        System.out.print("-----Paczka 1: " +md.resolve().getPackageName() +"\tMetoda1: " + methodTwoAndWeightSecond);
-//                        System.out.println("\t-----Paczka 2: " +mce.resolve().getPackageName() +"\tMetoda2: " + methodTwoAndWeight);
-//
-//                        methodTwoAndWeight.forEach((k, v) -> methodTwoAndWeightSecond.merge(k, v, Integer::sum));
-//                        System.out.println(methodTwoAndWeightSecond);
+
                     }
-
-
                 }
             }
         });
-//        System.out.println(methodAndModuleWeight);
-        //System.out.println(moduleOneModuleTwoWeight);
+        for(String key: methodAndModuleWeightOne.keySet() ){
+                if(methodAndModuleWeightTwo.containsKey(key)){
+                    methodAndModuleWeightTwo.get(key).forEach((k, v) -> methodAndModuleWeightOne.get(key).merge(k, v, Integer::sum));
+                }else{
+                    methodAndModuleWeightTwo.put(key,methodAndModuleWeightOne.get(key));
+                }
+        }
+        methodAndModuleWeight.putAll(methodAndModuleWeightOne);
+        // methodAndModuleWeight mapa zawierająca <Paczka,<Metoda,wagakrawedzi>>
+        // moduleOneModuleTwoWeight mapa zawierajaca<Paczka1,<Paczka2, waga krawedzi>>
+        System.out.println(methodAndModuleWeight);
+        System.out.println(moduleOneModuleTwoWeight);
+
         return moduleOneModuleTwoWeight;
     }
 

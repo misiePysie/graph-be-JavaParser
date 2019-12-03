@@ -43,12 +43,12 @@ public class DataGuide {
         reflectionTypeSolver = new ReflectionTypeSolver();
         combinedTypeSolver.add(reflectionTypeSolver);
         combinedTypeSolver.add(typeSolver);
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-logic-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("/Users/dominikstrama/Desktop/jar_files/gson-2.8.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-logic-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/gson-2.8.2.jar"));
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
@@ -76,17 +76,30 @@ public class DataGuide {
 
 
     }
+
     // Historyjka 1
     // Połączenia pomiędzy plikami
 
 
     public Map<String, Map<String,Integer>> FilesConnections(){
+        //stworzenie listy plików;
+        final ArrayList<JavaFile> listOfJavaFiles=new ArrayList<JavaFile>();
+        addAllFilesToList(listOfJavaFiles);
 
-        List<Integer> weigth = new ArrayList<>();
+
+        ArrayList<EdgeFile_File> listOfEdgesFile_File=new ArrayList<EdgeFile_File>();
+        final JavaFile tempTwoJavaFile=new JavaFile();
+        final JavaFile tempOneJavaFile=new JavaFile();
 
         clasesFiles.forEach(file -> {
-            int fileWeigth = (int)file.length();
-            weigth.add(fileWeigth);
+            int value=0;
+
+            for (JavaFile f:listOfJavaFiles) {
+                if(file.getName().substring(0, file.getName().lastIndexOf(".java")).equals(f.getJavaFileName())){
+                    tempOneJavaFile.setJavaFileName(f.getJavaFileName());
+                    tempOneJavaFile.setSize(f.getSize());
+                }
+            }
 
             CompilationUnit cu = null;
             try {
@@ -95,25 +108,73 @@ public class DataGuide {
                 e.printStackTrace();
             }
 
-            Map<String,Integer> fileTwoAndWeight = new HashMap<>();
+            HashMap<String,Integer> fileTwoAndWeight = new HashMap<>();
+            boolean isAlreadyInList=false;
 
             for(MethodCallExpr mce : cu.findAll(MethodCallExpr.class)){
+
                     if(classesNames.contains(mce.resolve().getClassName())){
 
                         if(fileTwoAndWeight.containsKey(mce.resolve().getClassName())){
-                            int value = fileTwoAndWeight.get(mce.resolve().getClassName()) + 1;
+                            value = fileTwoAndWeight.get(mce.resolve().getClassName()) + 1;
                             fileTwoAndWeight.put(mce.resolve().getClassName(),value);
                         }else{
                             fileTwoAndWeight.put(mce.resolve().getClassName(),1);
                         }
-                        System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t Weight File One: " + fileWeigth + "\t File two : " + mce.resolve().getClassName() + "\t Method from file two : " + mce.resolve().getName() );
+
+                        System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t File two : " + mce.resolve().getClassName()  );
                     }
+
                 fileOneFileTwoWeight.put(file.getName().substring(0, file.getName().lastIndexOf(".java")),fileTwoAndWeight);
             }
+            addAllEdgesToList(listOfEdgesFile_File,listOfJavaFiles,tempOneJavaFile,fileTwoAndWeight);
 
         });
         System.out.println(fileOneFileTwoWeight);
         return fileOneFileTwoWeight;
+    }
+    public void setSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
+    {
+        double max=-1;
+        int index=-1;
+        for (int i = 0; i< listOfJavaFiles.size(); i++)
+        {
+            if(listOfJavaFiles.get(i).getSize()>max) {
+                max = listOfJavaFiles.get(i).getSize();
+                index = i;
+            }
+        }
+        listOfJavaFiles.get(index).setSize(100);
+        int val=0;
+        for(int i = 0; i< listOfJavaFiles.size(); i++)
+        {
+            val=(int)((listOfJavaFiles.get(i).getSize()*100)/max);
+            listOfJavaFiles.get(i).setSize(val);
+        }
+
+    }
+    public void addAllEdgesToList(ArrayList<EdgeFile_File> listOfEdgesFile_File,ArrayList<JavaFile> listOFJavaFiles,JavaFile fileOne,HashMap<String,Integer> fileTwoAndWeight){
+
+        listOFJavaFiles.forEach(f->{
+            if(fileTwoAndWeight.containsKey(f.getJavaFileName())){
+                int weight=fileTwoAndWeight.get(f.getJavaFileName()).intValue();
+                listOfEdgesFile_File.add(new EdgeFile_File(fileOne,f,weight));
+            }
+        });
+        listOfEdgesFile_File.forEach(e-> System.out.println(e));
+    }
+    public void addAllFilesToList(ArrayList<JavaFile> listOfJavaFiles){
+
+        clasesFiles.forEach(file -> {
+                    int fileWeight = (int)file.length();
+                    //   weight.add(fileWeight);
+                    JavaFile javaFile=new JavaFile(file.getName().substring(0, file.getName().lastIndexOf(".java")),fileWeight);
+                    listOfJavaFiles.add(javaFile);
+                });
+        //ustawienie wartosci pod kolka
+        setSizeForCircles(listOfJavaFiles);
+
+        listOfJavaFiles.forEach(f-> System.out.println(f));
     }
 
     // Historyjka 2

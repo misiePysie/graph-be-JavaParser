@@ -11,7 +11,7 @@ public class GraphApplication {
     public static void main (String args[]) throws IOException, NoSuchFieldException, ClassNotFoundException{
         //SpringApplication.run(GraphApplication.class, args);
         DataGuide amwjp = new DataGuide();
-        amwjp.findModuleDependencies("/Users/dominikstrama/Desktop/graph-be-JavaParser/src/main/java");
+        amwjp.findModuleDependencies("F:\\Java\\Projects\\IOIOIO\\graph-be-JavaParser\\src\\main\\java");
 
     }
 }

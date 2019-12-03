@@ -9,6 +9,9 @@ public class JavaFile {
         this.size = size;
     }
 
+    public JavaFile() {
+    }
+
     public String getJavaFileName() {
         return javaFileName;
     }

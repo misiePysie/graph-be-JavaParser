@@ -3,6 +3,7 @@ import SpringApplication.GraphApplication;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
@@ -27,7 +28,11 @@ public class DataGuide {
 
     private static Set<File> clasesFiles;
     private static List<String> classesNames;
+    private static List<String> methodsNames;
     private static Map<String,Integer> filesWeight;
+    private static Map<String,Integer> methodsWeight;
+    private static Map<String,Map<String,Integer>> fileOneFileTwoWeight;
+    private static Map<String,Map<String,Integer>> methodOneMethodTwoWeight;
 
 
     public void findModuleDependencies(String rootPath) throws IOException, ClassNotFoundException, NoSuchFieldException {
@@ -49,9 +54,14 @@ public class DataGuide {
 
         clasesFiles = new HashSet<>();
         classesNames = new ArrayList<>();
+        methodsNames = new ArrayList<>();
         filesWeight = new HashMap<>();
+        fileOneFileTwoWeight = new HashMap<>();
+        methodOneMethodTwoWeight = new HashMap<>();
+        methodsWeight = new HashMap<>();
 
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
+
             checkDirectory(file, clasesFiles);
         });
 
@@ -59,19 +69,22 @@ public class DataGuide {
             classesNames.add(file.getName().substring(0,file.getName().lastIndexOf(".java")));
         });
 
+
+
         FilesConnections();
+        //MethodConnections();
+
+
     }
     // Historyjka 1
     // Połączenia pomiędzy plikami
 
+
     public Map<String, Map<String,Integer>> FilesConnections(){
 
-        Map<String, Map<String, Integer>> filesInformation = new HashMap<>();
         List<Integer> weigth = new ArrayList<>();
 
         clasesFiles.forEach(file -> {
-
-            String firstFileName = file.getName().substring(0,file.getName().lastIndexOf(".java"));
             int fileWeigth = (int)file.length();
             weigth.add(fileWeigth);
 
@@ -82,23 +95,67 @@ public class DataGuide {
                 e.printStackTrace();
             }
 
-            for(ImportDeclaration id : cu.getImports() ){
-                if(classesNames.contains(id.getName().getIdentifier())){
-                    System.out.println("File name: " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + " Imports: " + id.getName().getIdentifier());
-                }
-            }
+            Map<String,Integer> fileTwoAndWeight = new HashMap<>();
 
             for(MethodCallExpr mce : cu.findAll(MethodCallExpr.class)){
                     if(classesNames.contains(mce.resolve().getClassName())){
+
+                        if(fileTwoAndWeight.containsKey(mce.resolve().getClassName())){
+                            int value = fileTwoAndWeight.get(mce.resolve().getClassName()) + 1;
+                            fileTwoAndWeight.put(mce.resolve().getClassName(),value);
+                        }else{
+                            fileTwoAndWeight.put(mce.resolve().getClassName(),1);
+                        }
                         System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t Weight File One: " + fileWeigth + "\t File two : " + mce.resolve().getClassName() + "\t Method from file two : " + mce.resolve().getName() );
                     }
+                fileOneFileTwoWeight.put(file.getName().substring(0, file.getName().lastIndexOf(".java")),fileTwoAndWeight);
             }
 
         });
-
-        return filesInformation;
+        System.out.println(fileOneFileTwoWeight);
+        return fileOneFileTwoWeight;
     }
 
+    // Historyjka 2
+    // Połączenia pomiędzy plikami
+    public Map<String, Map<String,Integer>> MethodConnections(){
+
+        clasesFiles.forEach(file -> {
+            CompilationUnit cu = null;
+            try {
+                cu = StaticJavaParser.parse(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            for(MethodDeclaration md : cu.findAll(MethodDeclaration.class)){
+                Map<String,Integer> methodTwoAndWeight = new HashMap<>();
+                for(MethodCallExpr mce : md.findAll(MethodCallExpr.class)){
+                    if(classesNames.contains(mce.resolve().getClassName())){
+                        if(methodsWeight.containsKey(mce.resolve().getName())){
+                            int value = methodsWeight.get(mce.resolve().getName()) + 1;
+                            methodsWeight.put(mce.resolve().getName(),value);
+                        }
+                        else{
+                            methodsWeight.put(mce.resolve().getName(),1);
+                        }
+                        if(methodTwoAndWeight.containsKey(mce.resolve().getName())){
+                            int value = methodTwoAndWeight.get(mce.resolve().getName()) + 1;
+                            methodTwoAndWeight.put(mce.resolve().getName(),value);
+                        }
+                        else{
+                            methodTwoAndWeight.put(mce.resolve().getName(),1);
+                        }
+                        methodOneMethodTwoWeight.put(md.resolve().getName(),methodTwoAndWeight);
+                    }
+                }
+
+            }
+        });
+
+        // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
+        // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
+        return methodOneMethodTwoWeight;
+    }
 
 
     private void checkDirectory (File file, Set<File> list){

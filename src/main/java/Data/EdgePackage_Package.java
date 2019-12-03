@@ -1,5 +1,4 @@
 package Data;
-
 public class EdgePackage_Package {
     private Package packageFrom;
     private Package packageTo;

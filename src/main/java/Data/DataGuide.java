@@ -76,9 +76,9 @@ public class DataGuide {
 
 
     }
-
+    //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
-    // Połączenia pomiędzy plikami
+    // Połączenia pomiędzy plikami File_File
 
 
     public Map<String, Map<String,Integer>> FilesConnections(){
@@ -122,7 +122,7 @@ public class DataGuide {
                             fileTwoAndWeight.put(mce.resolve().getClassName(),1);
                         }
 
-                        System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t File two : " + mce.resolve().getClassName()  );
+                        //System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t File two : " + mce.resolve().getClassName()  );
                     }
 
                 fileOneFileTwoWeight.put(file.getName().substring(0, file.getName().lastIndexOf(".java")),fileTwoAndWeight);
@@ -130,7 +130,9 @@ public class DataGuide {
             addAllEdgesToList(listOfEdgesFile_File,listOfJavaFiles,tempOneJavaFile,fileTwoAndWeight);
 
         });
-        System.out.println(fileOneFileTwoWeight);
+
+        //todo: Dla Norbiego do przekazania chlopakom: listOfEdgesFile_File,listOfJavaFiles
+
         return fileOneFileTwoWeight;
     }
     public void setSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
@@ -176,7 +178,7 @@ public class DataGuide {
 
         listOfJavaFiles.forEach(f-> System.out.println(f));
     }
-
+    //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
     // Połączenia pomiędzy plikami
     public Map<String, Map<String,Integer>> MethodConnections(){

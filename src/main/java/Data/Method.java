@@ -3,6 +3,7 @@ package Data;
 public class Method {
     private String methodName;
     private int size;
+    private int weight;
 
     public Method(String methodName) {
         this.methodName = methodName;
@@ -10,6 +11,11 @@ public class Method {
     }
 
     public Method() {
+    }
+
+    public Method(String methodName, int weight) {
+        this.methodName = methodName;
+        this.weight = weight;
     }
 
     public String getMethodName() {

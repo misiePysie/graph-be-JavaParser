@@ -11,6 +11,9 @@ public class EdgeFile_File {
         this.weight=weight;
     }
 
+    public EdgeFile_File() {
+    }
+
     public JavaFile getFileFrom() {
         return fileFrom;
     }

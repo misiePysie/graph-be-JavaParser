@@ -13,6 +13,9 @@ public class EdgeMethod_Method {
         this.weight = weight;
     }
 
+    public EdgeMethod_Method() {
+    }
+
     public Method getMethodFrom() {
         return methodFrom;
     }

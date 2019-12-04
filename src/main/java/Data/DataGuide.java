@@ -3,6 +3,7 @@ import SpringApplication.GraphApplication;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -12,7 +13,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import sun.security.krb5.internal.PAData;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -235,9 +236,10 @@ public class DataGuide {
     // Połączenia pomiędzy metodami
     public HashMap<String, HashMap<String,Integer>> ModuleConnections(AllData allData){
         ArrayList<Package> listOfPackages=new ArrayList<>();
-
-        addListOfPackages(listOfPackages);
-
+        ArrayList<EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
+        ArrayList<Method> listOfMethods=new ArrayList<>();
+        ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package=new ArrayList<>();
+       // addListOfPackages(listOfPackages);
 
         clasesFiles.forEach(file -> {
 
@@ -247,7 +249,6 @@ public class DataGuide {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
             HashMap<String,Integer> moduleTwoAndWeight = new HashMap<>();
             HashMap<String,Integer> methodTwoAndWeight = new HashMap<>();
             HashMap<String,Integer> methodTwoAndWeightSecond = new HashMap<>();
@@ -300,71 +301,88 @@ public class DataGuide {
         // moduleOneModuleTwoWeight mapa zawierajaca<Paczka1,<Paczka2, waga krawedzi>>
         System.out.println( "Method_Module: "+methodAndModuleWeight);
         System.out.println("Module_Module:"+moduleOneModuleTwoWeight);
-
-
-       // setPackagesSizeForCircles(listOfPackages);
-       // listOfPackages.forEach(x-> System.out.println(x));
-
-
+        addListOfPackages(listOfPackages,moduleOneModuleTwoWeight);
+        addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
+        addAllEdgesMethod_PackagesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
 
         return moduleOneModuleTwoWeight;
     }
-    public void setPackagesSizeForCircles(ArrayList<Package> listOfPackages)
+    public  void addAllEdgesMethod_PackagesToList(ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package,ArrayList<Method> listOfMethods,ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> methodAndModuleWeight)
     {
-        int max=-1;
-        int index=0;
-        for (int i = 0; i< listOfPackages.size(); i++)
-        {
-            if(listOfPackages.get(i).getSize()>max) {
-                max = listOfPackages.get(i).getSize();
-                index = i;
+        EdgeMethod_Package edgeMethod_package=new EdgeMethod_Package();
+        Method temp1=new Method();
+        Package temp2=new Package();
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : methodAndModuleWeight.entrySet()) {
+            String name1=firstEntry.getKey();
+            for(Package p:listOfPackages){
+                if(p.getPackageName().equals(name1)){
+                    temp2=p;
+                }
+            }
+
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                Integer weight=secondEntry.getValue();
+                for(Method m:listOfMethods){
+                    if(m.getMethodName().equals(name2)){
+                        temp1=m;
+                    }
+                }
+                edgeMethod_package=new EdgeMethod_Package(temp1,temp2,weight);
+                if(!listOfEdgesMethod_Package.contains(edgeMethod_package)) listOfEdgesMethod_Package.add(edgeMethod_package);
+
             }
         }
-        listOfPackages.get(index).setSize(500);
-        int val=0;
-        for(int i = 0; i< listOfPackages.size(); i++)
-        {
-            val=(listOfPackages.get(i).getSize()*500)/max;
-            listOfPackages.get(i).setSize(val);
-        }
+        listOfEdgesMethod_Package.forEach(x-> System.out.println(x));
 
     }
     public void addAllEdgesPackage_PackagesToList(ArrayList<Package> listOfPackages,ArrayList<EdgePackage_Package> listOfEdgesPackage_Package,HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight)
     {
-        EdgePackage_Package edgePackage_package;
-        Iterator firstIterator=moduleOneModuleTwoWeight.entrySet().iterator();
-        Iterator secondIterator;
-        while(firstIterator.hasNext()){
-            Map.Entry mapElement=(Map.Entry)firstIterator.next();
-            //Map.Entry mapInsideElement=(Map.Entry)
+        EdgePackage_Package edgePackage_package=new EdgePackage_Package();
+        Package temp1=new Package();
+        Package temp2=new Package();
 
-         // edgePackage_package=new EdgePackage_Package(mapElement.getKey().toString(),mapElement.getValue().toString());
-        }
-       // Package p=new Package(moduleOneModuleTwoWeight.ge)
-    }
-    public void addListOfPackages(ArrayList<Package> listOfPackages)
-    {
-
-        clasesFiles.forEach(file -> {
-            boolean isAlreadyAtList=false;
-            int ppackageWeight = (int) file.getParentFile().length();
-            //   weight.add(fileWeight);
-            Package aPackage = new Package(file.getParentFile().getName(), ppackageWeight);
-
-
-            //if(!listOfPackages.contains(aPackage)) listOfPackages.add(aPackage);
-          //  System.out.println(aPackage);
-            for (Package p : listOfPackages) {
-                if (p.getPackageName().equals(aPackage.getPackageName())) {
-                    isAlreadyAtList = true;
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : moduleOneModuleTwoWeight.entrySet()) {
+            String name1=firstEntry.getKey();
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                Integer weight=secondEntry.getValue();
+                for(Package p:listOfPackages){
+                    if(p.getPackageName().equals(name1)){
+                        temp1=p;
+                    }
+                    if(p.getPackageName().equals(name2)){
+                        temp2=p;
+                    }
                 }
-            }
-            if (!isAlreadyAtList){
-                listOfPackages.add(aPackage);
-            }
-        });
+                edgePackage_package=new EdgePackage_Package(temp1,temp2,weight);
+                if(!listOfEdgesPackage_Package.contains(edgePackage_package)) listOfEdgesPackage_Package.add(edgePackage_package);
 
+            }
+        }
+        listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
+    }
+    public void addListOfPackages(ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> hashMapHashMap)
+    {
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : hashMapHashMap.entrySet()) {
+            String name1=firstEntry.getKey();
+            boolean isAlreadyAtList=false;
+            for(Package p:listOfPackages){
+                if(p.getPackageName().equals(name1)) isAlreadyAtList=true;
+            }
+            if(!isAlreadyAtList) listOfPackages.add(new Package(name1,500));
+
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                for(Package p:listOfPackages){
+                    if(p.getPackageName().equals(name2)) isAlreadyAtList=true;
+                }
+                if(!isAlreadyAtList) listOfPackages.add(new Package(name2,500));
+
+            }
+        }
         listOfPackages.forEach(x-> System.out.println(x));
+
     }
 
 

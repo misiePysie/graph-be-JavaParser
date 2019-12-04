@@ -9,6 +9,9 @@ public class Method {
         this.size=10;
     }
 
+    public Method() {
+    }
+
     public String getMethodName() {
         return methodName;
     }

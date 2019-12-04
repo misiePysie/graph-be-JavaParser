@@ -13,6 +13,9 @@ public class Package {
         this.packageName = packageName;
     }
 
+    public Package() {
+    }
+
     public String getPackageName() {
         return packageName;
     }

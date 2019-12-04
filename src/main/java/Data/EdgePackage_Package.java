@@ -15,6 +15,9 @@ public class EdgePackage_Package {
         this.weight = weight;
     }
 
+    public EdgePackage_Package() {
+    }
+
     public Package getPackageFrom() {
         return packageFrom;
     }

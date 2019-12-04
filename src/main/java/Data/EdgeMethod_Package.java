@@ -10,6 +10,15 @@ public class EdgeMethod_Package {
         this.packageTo = packageTo;
     }
 
+    public EdgeMethod_Package() {
+    }
+
+    public EdgeMethod_Package(Method methodFrom, Package packageTo, int weight) {
+        this.methodFrom = methodFrom;
+        this.packageTo = packageTo;
+        this.weight = weight;
+    }
+
     public Method getMethodFrom() {
         return methodFrom;
     }

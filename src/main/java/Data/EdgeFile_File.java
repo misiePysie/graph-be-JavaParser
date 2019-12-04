@@ -34,4 +34,13 @@ public class EdgeFile_File {
     public void setWeight(int weight) {
         this.weight = weight;
     }
+
+    @Override
+    public String toString() {
+        return "EdgeFile_File{" +
+                "fileFrom=" + fileFrom +
+                ", fileTo=" + fileTo +
+                ", weight=" + weight +
+                '}';
+    }
 }

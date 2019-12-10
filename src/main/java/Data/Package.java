@@ -2,16 +2,17 @@ package Data;
 
 public class Package {
     private String packageName;
-    private int size;
+    private int circleSize;
 
     public Package(String packageName, int size) {
         this.packageName = packageName;
-        this.size = size;
+        this.circleSize = size;
     }
 
     public Package(String packageName) {
         this.packageName = packageName;
     }
+
 
     public Package() {
     }
@@ -25,18 +26,18 @@ public class Package {
     }
 
     public int getSize() {
-        return size;
+        return circleSize;
     }
 
     public void setSize(int size) {
-        this.size = size;
+        this.circleSize = size;
     }
 
     @Override
     public String toString() {
         return "Package{" +
                 "packageName='" + packageName + '\'' +
-                ", size=" + size +
+                ", circleSize=" + circleSize +
                 '}';
     }
 }

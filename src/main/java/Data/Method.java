@@ -2,12 +2,12 @@ package Data;
 
 public class Method {
     private String methodName;
-    private int size;
+    private int circleSize;
     private int weight;
 
     public Method(String methodName) {
         this.methodName = methodName;
-        this.size=10;
+        this.circleSize =10;
     }
 
     public Method() {
@@ -26,19 +26,19 @@ public class Method {
         this.methodName = methodName;
     }
 
-    public int getSize() {
-        return size;
+    public int getCircleSize() {
+        return circleSize;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setCircleSize(int circleSize) {
+        this.circleSize = circleSize;
     }
 
     @Override
     public String toString() {
         return "Method{" +
                 "methodName='" + methodName + '\'' +
-                ", size=" + size +
+                ", circleSize=" + circleSize +
                 '}';
     }
 }

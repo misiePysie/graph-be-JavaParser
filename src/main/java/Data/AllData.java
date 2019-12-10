@@ -11,9 +11,11 @@ public class AllData {
 
     private  ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package;
     private  ArrayList<EdgeMethod_Method> listOfEdgesMethod_Method;
+
+    private ArrayList<EdgePackage_Package> listOfEdgesPackage_Package;
+
     public AllData() {
     }
-
     public ArrayList<JavaFile> getListOfJavaFiles() {
         return listOfJavaFiles;
     }
@@ -60,5 +62,13 @@ public class AllData {
 
     public void setListOfPackages(ArrayList<Package> listOfPackages) {
         this.listOfPackages = listOfPackages;
+    }
+
+    public ArrayList<EdgePackage_Package> getListOfEdgesPackage_Package() {
+        return listOfEdgesPackage_Package;
+    }
+
+    public void setListOfEdgesPackage_Package(ArrayList<EdgePackage_Package> listOfEdgesPackage_Package) {
+        this.listOfEdgesPackage_Package = listOfEdgesPackage_Package;
     }
 }

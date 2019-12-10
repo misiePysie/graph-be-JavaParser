@@ -45,6 +45,7 @@ public class EdgeMethod_Method {
         return "EdgeMethod_Method{" +
                 "methodFrom=" + methodFrom +
                 ", methodTo=" + methodTo +
+                ", weight="+weight+
                 "}";
     }
 }

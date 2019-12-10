@@ -152,26 +152,26 @@ public class DataGuide {
         listOfEdgesFile_File.forEach(x-> System.out.println(x));
         return fileOneFileTwoWeight;
     }
-    public void setJavaFilesSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
-    {
-        double max=-1;
-
-        int index=-1;
-        for (int i = 0; i< listOfJavaFiles.size(); i++)
-        {
-            if(listOfJavaFiles.get(i).getSize()>max) {
-                max = listOfJavaFiles.get(i).getSize();
-                index = i;
-            }
-        }
-        listOfJavaFiles.get(index).setSize(100);
-        int val = 0;
-        for (int i = 0; i < listOfJavaFiles.size(); i++) {
-            val = (int) ((listOfJavaFiles.get(i).getSize() * 100) / max);
-            listOfJavaFiles.get(i).setSize(val);
-        }
-
-    }
+//    public void setJavaFilesSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
+//    {
+//        double max=-1;
+//
+//        int index=-1;
+//        for (int i = 0; i< listOfJavaFiles.size(); i++)
+//        {
+//            if(listOfJavaFiles.get(i).getSize()>max) {
+//                max = listOfJavaFiles.get(i).getSize();
+//                index = i;
+//            }
+//        }
+//        listOfJavaFiles.get(index).setSize(100);
+//        int val = 0;
+//        for (int i = 0; i < listOfJavaFiles.size(); i++) {
+//            val = (int) ((listOfJavaFiles.get(i).getSize() * 100) / max);
+//            listOfJavaFiles.get(i).setSize(val);
+//        }
+//
+//    }
 
     public void addAllEdgesToList(ArrayList<EdgeFile_File> listOfEdgesFile_File, ArrayList<JavaFile> listOFJavaFiles, JavaFile fileOne, HashMap<String,HashMap<String, Integer>> fileOneFileTwoWeight ) {
 
@@ -180,25 +180,26 @@ public class DataGuide {
         JavaFile temp2=new JavaFile();
         for (Map.Entry<String, HashMap<String, Integer>> firstEntry : fileOneFileTwoWeight.entrySet()) {
             String name1=firstEntry.getKey();
-            for(JavaFile file1:listOFJavaFiles){
-                if(file1.getJavaFileName().equals(name1)){
-                    temp1=file1;
+            for(JavaFile file1:listOFJavaFiles) {
+                if (file1.getJavaFileName().equals(name1)) {
+                    temp1 = file1;
                 }
             }
 
             for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
                 String name2 = secondEntry.getKey();
-                Integer weight=secondEntry.getValue();
-                for(JavaFile file2:listOFJavaFiles){
-                    if(file2.getJavaFileName().equals(name2)){
-                        temp1=file2;
+                Integer weight = secondEntry.getValue();
+                for (JavaFile file2 : listOFJavaFiles) {
+                    if (file2.getJavaFileName().equals(name2)) {
+                        temp2 = file2;
                     }
                 }
-                edgeFile_file=new EdgeFile_File(temp1,temp2,weight);
-                System.out.println(edgeFile_file);
-                if(!listOfEdgesFile_File.contains(edgeFile_file)) listOfEdgesFile_File.add(edgeFile_file);
-
+                edgeFile_file = new EdgeFile_File(temp1, temp2, weight);
+               // System.out.println(edgeFile_file);
+                if (!listOfEdgesFile_File.contains(edgeFile_file)) listOfEdgesFile_File.add(edgeFile_file);
             }
+
+
         }
     }
 
@@ -211,7 +212,7 @@ public class DataGuide {
             listOfJavaFiles.add(javaFile);
         });
         //ustawienie wartosci pod kolka
-        setJavaFilesSizeForCircles(listOfJavaFiles);
+      //setJavaFilesSizeForCircles(listOfJavaFiles);
 
        // listOfJavaFiles.forEach(f -> System.out.println(f));
     }
@@ -257,13 +258,14 @@ public class DataGuide {
 
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
+        allData.setListOfMethods(methodsList);
+        allData.setListOfEdgesMethod_Method(methodsEdgesList);
         System.out.println("Lista metod: ");
         addMethodsToList(methodsList, methodOneMethodTwoWeight);
         //addMethodsToList(methodsList, methodsWeight);
         System.out.println("Lista krawedzi metoda_metoda: ");
-        addMethodsEdgesToList(methodsEdgesList,methodOneMethodTwoWeight);
-        allData.setListOfMethods(methodsList);
-        allData.setListOfEdgesMethod_Method(methodsEdgesList);
+        addMethodsEdgesToList(methodsEdgesList,methodOneMethodTwoWeight,methodsList);
+
         return methodOneMethodTwoWeight;
     }
     // Historyjka 3
@@ -333,11 +335,16 @@ public class DataGuide {
         methodAndModuleWeight.putAll(methodAndModuleWeightOne);
         // methodAndModuleWeight mapa zawierająca <Paczka,<Metoda,wagakrawedzi>>
         // moduleOneModuleTwoWeight mapa zawierajaca<Paczka1,<Paczka2, waga krawedzi>>
+
+        //lista metod musi byc juz wczesniej gotowa :O dltego tzreba wywolywac wczesniej metod_metod
         listOfMethods=allData.getListOfMethods();
 
         addListOfPackages(listOfPackages,moduleOneModuleTwoWeight);
         addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
         addAllEdgesMethod_PackagesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
+        allData.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
+        allData.setListOfPackages(listOfPackages);
+        allData.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
         System.out.println("Lista paczek:");
         listOfPackages.forEach(x-> System.out.println(x));
         System.out.println("Lista krawedzi paczka_paczka: ");
@@ -441,17 +448,36 @@ public class DataGuide {
     }
 
     public void addMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight) {
+        boolean isAlreadyAtList=false;
 
         for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
             String methodName = entry.getKey();
             Method method = new Method(methodName);
-            methodsList.add(method);
+            for(Method m:methodsList){
+                if(m.getMethodName().equals(entry.getKey()))
+                {
+                    isAlreadyAtList=true;
+                }
+            }
+            if(!isAlreadyAtList){
+                methodsList.add(method);
+            }
+            isAlreadyAtList=false;
             Map<String, Integer> temp = entry.getValue();
             for (Map.Entry<String, Integer> entr : temp.entrySet()) {
                 String methodName1 = entr.getKey();
                 Method method1 = new Method(methodName1);
-                methodsList.add(method1);
+                for(Method m:methodsList){
+                    if(m.getMethodName().equals(entr.getKey()))
+                    {
+                        isAlreadyAtList=true;
+                    }
+                }
+                if(!isAlreadyAtList) {
+                    methodsList.add(method1);
+                }
             }
+            isAlreadyAtList=false;
         }
 
 
@@ -460,16 +486,30 @@ public class DataGuide {
         }
     }
 
-    public void addMethodsEdgesToList(ArrayList<EdgeMethod_Method> methodsEdgesList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight) {
+    public void addMethodsEdgesToList(ArrayList<EdgeMethod_Method> methodsEdgesList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight,ArrayList<Method> methodsList) {
 
         for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
             Method methodFrom = new Method();
-            methodFrom.setMethodName(entry.getKey());
+            for(int i=0;i<methodsList.size();i++)
+            {
+                if(methodsList.get(i).getMethodName().equals(entry.getKey()))
+                {
+                    methodFrom=methodsList.get(i);
+                }
+            }
+           // methodFrom.setMethodName(entry.getKey());
             Map<String, Integer> temp = entry.getValue();
             for (Map.Entry<String, Integer> entr : temp.entrySet()) {
                 Method methodTo=new Method();
                 int edgeWeight;
-                methodTo.setMethodName(entr.getKey());
+                for(int i=0;i<methodsList.size();i++)
+                {
+                    if(methodsList.get(i).getMethodName().equals(entr.getKey()))
+                    {
+                        methodTo=methodsList.get(i);
+                    }
+                }
+                //methodTo.setMethodName(entr.getKey());
                 edgeWeight=entr.getValue();
                 EdgeMethod_Method edge=new EdgeMethod_Method(methodFrom,methodTo,edgeWeight);
                 methodsEdgesList.add(edge);

@@ -82,10 +82,10 @@ public class DataGuide {
 
 
 
-     //FilesConnections();
-     //MethodConnections();
+     FilesConnections();
+     MethodConnections();
      ModuleConnections();
-     //MethodFileConnections();
+     MethodFileConnections();
 
 
     }
@@ -101,7 +101,7 @@ public class DataGuide {
 
 
         ArrayList<EdgeFile_File> listOfEdgesFile_File = new ArrayList<EdgeFile_File>();
-        final JavaFile tempTwoJavaFile = new JavaFile();
+       // final JavaFile tempTwoJavaFile = new JavaFile();
         final JavaFile tempOneJavaFile = new JavaFile();
 
         clasesFiles.forEach(file -> {
@@ -285,10 +285,22 @@ public class DataGuide {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            boolean isAlreadyAtList=false;
             for(MethodDeclaration md:cu.findAll(MethodDeclaration.class)){
-                String nameOfMethod=md.resolve().getName();
-                Method method=new Method(nameOfMethod);
-                listOfMethods.add(method);
+                    if(!Objects.equals(md.resolve().getName(), null)) {
+                        String nameOfMethod = md.resolve().getName();
+                        for (Method m : listOfMethods) {
+                            if (m.getMethodName().equals(nameOfMethod)) {
+                                isAlreadyAtList = true;
+                            }
+                        }
+                        if (!isAlreadyAtList) {
+                            Method method = new Method(nameOfMethod);
+                            listOfMethods.add(method);
+                        }
+                    }
+
+
             }
             HashMap<String,Integer> moduleTwoAndWeight = new HashMap<>();
             HashMap<String,Integer> methodTwoAndWeight = new HashMap<>();

@@ -82,10 +82,10 @@ public class DataGuide {
 
 
 
-     FilesConnections();
-     MethodConnections();
+     //FilesConnections();
+     //MethodConnections();
      ModuleConnections();
-     MethodFileConnections();
+     //MethodFileConnections();
 
 
     }
@@ -273,7 +273,7 @@ public class DataGuide {
     public HashMap<String, HashMap<String,Integer>> ModuleConnections(){
         ArrayList<Package> listOfPackages=new ArrayList<>();
         ArrayList<EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
-        ArrayList<Method> listOfMethods=new ArrayList<>();
+        final ArrayList<Method> listOfMethods=new ArrayList<>();
         ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package=new ArrayList<>();
        // addListOfPackages(listOfPackages);
 
@@ -284,6 +284,11 @@ public class DataGuide {
                 cu = StaticJavaParser.parse(file);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+            }
+            for(MethodDeclaration md:cu.findAll(MethodDeclaration.class)){
+                String nameOfMethod=md.resolve().getName();
+                Method method=new Method(nameOfMethod);
+                listOfMethods.add(method);
             }
             HashMap<String,Integer> moduleTwoAndWeight = new HashMap<>();
             HashMap<String,Integer> methodTwoAndWeight = new HashMap<>();
@@ -337,7 +342,7 @@ public class DataGuide {
         // moduleOneModuleTwoWeight mapa zawierajaca<Paczka1,<Paczka2, waga krawedzi>>
 
         //lista metod musi byc juz wczesniej gotowa :O dltego tzreba wywolywac wczesniej metod_metod
-        listOfMethods=allData.getListOfMethods();
+
 
         addListOfPackages(listOfPackages,moduleOneModuleTwoWeight);
         addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
@@ -345,6 +350,7 @@ public class DataGuide {
         allData.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
         allData.setListOfPackages(listOfPackages);
         allData.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
+        allData.setListOfMethods(listOfMethods);
         System.out.println("Lista paczek:");
         listOfPackages.forEach(x-> System.out.println(x));
         System.out.println("Lista krawedzi paczka_paczka: ");

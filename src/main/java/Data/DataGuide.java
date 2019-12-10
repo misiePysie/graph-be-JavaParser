@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 
 public class DataGuide {
-    private static final String path = "src/main/java";
+    private static String path = "src/main/java";
     private JavaSymbolSolver javaSymbolSolver;
     private TypeSolver typeSolver;
     private TypeSolver reflectionTypeSolver;
@@ -42,7 +42,7 @@ public class DataGuide {
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightOne;
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightTwo;
     private static HashMap<String, Set<String>> methodAndFile;
-    public void findModuleDependencies() throws IOException, ClassNotFoundException, NoSuchFieldException {
+    public AllData findModuleDependencies() throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.combinedTypeSolver = new CombinedTypeSolver();
         this.typeSolver = new JavaParserTypeSolver(path);
@@ -87,7 +87,7 @@ public class DataGuide {
      ModuleConnections();
      MethodFileConnections();
 
-
+        return allData;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
@@ -566,6 +566,12 @@ public class DataGuide {
         return methodAndFile;
     }
 
+    public static String getPath() {
+        return path;
+    }
 
+    public static void setPath(String path) {
+        DataGuide.path = path;
+    }
 }
 

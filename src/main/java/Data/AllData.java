@@ -71,4 +71,7 @@ public class AllData {
     public void setListOfEdgesPackage_Package(ArrayList<EdgePackage_Package> listOfEdgesPackage_Package) {
         this.listOfEdgesPackage_Package = listOfEdgesPackage_Package;
     }
+
+
+
 }

@@ -25,11 +25,11 @@ public class Package {
         this.packageName = packageName;
     }
 
-    public int getSize() {
+    public int getCircleSize() {
         return circleSize;
     }
 
-    public void setSize(int size) {
+    public void setCircleSize(int size) {
         this.circleSize = size;
     }
 

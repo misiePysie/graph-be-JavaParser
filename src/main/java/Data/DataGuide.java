@@ -41,7 +41,7 @@ public class DataGuide {
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeight;
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightOne;
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightTwo;
-
+    private static HashMap<String, Set<String>> methodAndFile;
     public void findModuleDependencies() throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.combinedTypeSolver = new CombinedTypeSolver();
@@ -70,7 +70,7 @@ public class DataGuide {
         methodAndModuleWeightTwo = new HashMap<>();
         methodAndModuleWeight = new HashMap<>();
         allData = new AllData();
-
+        methodAndFile = new HashMap<>();
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
 
             checkDirectory(file, clasesFiles);
@@ -85,7 +85,7 @@ public class DataGuide {
      FilesConnections();
      MethodConnections();
      ModuleConnections();
-
+     MethodFileConnections();
 
 
     }
@@ -481,6 +481,31 @@ public class DataGuide {
         }
 
 
+    }
+
+    // Historyjka 6
+    // Połczenia Metoda -> Plik
+    // methodAndFile return hashMap<String fileName, Set<String methods>>
+
+    public HashMap<String,Set<String>> MethodFileConnections(){
+
+        clasesFiles.forEach(file -> {
+            Set<String> methodsInSpecificFile = new HashSet<>();
+            CompilationUnit cu = null;
+            try {
+                cu = StaticJavaParser.parse(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            for (MethodDeclaration md : cu.findAll(MethodDeclaration.class)) {
+                HashMap<String, Integer> methodTwoAndWeight = new HashMap<>();
+                methodsInSpecificFile.add(md.resolve().getName());
+            }
+            if(!methodsInSpecificFile.isEmpty()){
+                methodAndFile.put(file.getName(), methodsInSpecificFile);
+            }
+        });
+        return methodAndFile;
     }
 
 

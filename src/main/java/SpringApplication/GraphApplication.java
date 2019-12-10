@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Properties;
 
 @SpringBootApplication
 public class GraphApplication {
@@ -15,6 +17,13 @@ public class GraphApplication {
         //SpringApplication.run(GraphApplication.class, args);
         DataGuide obj = new DataGuide();
         obj.findModuleDependencies();
+
+//        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
+//        xmlFileBuilder.elementsAndAttrtoXML();
+//        XMLBuilder2 builder = xmlFileBuilder.getBuilder();
+//        PrintWriter writer = new PrintWriter("files.xml");
+//        Properties properties = xmlFileBuilder.getProperties();
+//        builder.toWriter(writer, properties);
 
     }
 }

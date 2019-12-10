@@ -13,8 +13,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,12 +22,13 @@ import java.util.stream.Stream;
 
 
 public class DataGuide {
-
+    private static final String path = "src/main/java";
     private JavaSymbolSolver javaSymbolSolver;
     private TypeSolver typeSolver;
     private TypeSolver reflectionTypeSolver;
     private CombinedTypeSolver combinedTypeSolver;
     private File mainFile;
+    private AllData allData;
 
     private static Set<File> clasesFiles;
     private static List<String> classesNames;
@@ -43,20 +42,19 @@ public class DataGuide {
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightOne;
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightTwo;
 
-    public void findModuleDependencies(String rootPath,AllData allData) throws IOException, ClassNotFoundException, NoSuchFieldException {
+    public void findModuleDependencies() throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.combinedTypeSolver = new CombinedTypeSolver();
-        this.typeSolver = new JavaParserTypeSolver(rootPath);
-        this.mainFile = new File(rootPath);
+        this.typeSolver = new JavaParserTypeSolver(path);
+        this.mainFile = new File(path);
         reflectionTypeSolver = new ReflectionTypeSolver();
         combinedTypeSolver.add(reflectionTypeSolver);
         combinedTypeSolver.add(typeSolver);
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-logic-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-core-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/javaparser-symbol-solver-model-3.15.5.jar"));
-        combinedTypeSolver.add(new JarTypeSolver("F:/Java/Projects/IOIOIO/jary/gson-2.8.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/javaparser-symbol-solver-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/javaparser-symbol-solver-logic-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/javaparser-symbol-solver-model-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/javaparser-core-3.15.5.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/gson-2.8.2.jar"));
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
@@ -71,6 +69,8 @@ public class DataGuide {
         methodAndModuleWeightOne = new HashMap<>();
         methodAndModuleWeightTwo = new HashMap<>();
         methodAndModuleWeight = new HashMap<>();
+        allData = new AllData();
+
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
 
             checkDirectory(file, clasesFiles);
@@ -82,9 +82,10 @@ public class DataGuide {
 
 
 
-     FilesConnections(allData);
-     MethodConnections(allData);
-     ModuleConnections(allData);
+     FilesConnections();
+     MethodConnections();
+     ModuleConnections();
+
 
 
     }
@@ -93,7 +94,7 @@ public class DataGuide {
     // Połączenia pomiędzy plikami File_File
 
 
-    public HashMap<String, HashMap<String,Integer>> FilesConnections(AllData allData){
+    public HashMap<String, HashMap<String,Integer>> FilesConnections(){
         //stworzenie listy plików;
         final ArrayList<JavaFile> listOfJavaFiles = new ArrayList<JavaFile>();
         addAllFilesToList(listOfJavaFiles);
@@ -218,7 +219,7 @@ public class DataGuide {
     //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
     // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> MethodConnections(AllData allData){
+    public HashMap<String, HashMap<String,Integer>> MethodConnections(){
 
         ArrayList<Method> methodsList = new ArrayList<>();
         ArrayList<EdgeMethod_Method> methodsEdgesList = new ArrayList<>();
@@ -267,7 +268,7 @@ public class DataGuide {
     }
     // Historyjka 3
     // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> ModuleConnections(AllData allData){
+    public HashMap<String, HashMap<String,Integer>> ModuleConnections(){
         ArrayList<Package> listOfPackages=new ArrayList<>();
         ArrayList<EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
         ArrayList<Method> listOfMethods=new ArrayList<>();

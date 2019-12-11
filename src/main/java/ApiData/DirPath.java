@@ -1,11 +1,7 @@
 package ApiData;
 
-public class Path {
+public class DirPath {
     String path;
-
-    public Path(String path) {
-        this.path = path;
-    }
 
     public String getPath() {
         return path;
@@ -15,6 +11,4 @@ public class Path {
         this.path = path;
     }
 
-    public Path() {
-    }
 }

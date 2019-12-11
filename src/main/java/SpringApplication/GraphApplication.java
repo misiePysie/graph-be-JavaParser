@@ -1,5 +1,5 @@
 package SpringApplication;
-import Export.XMLFileBuilder;
+//import Export.XMLFileBuilder;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import Data.AllData;
 import Data.DataGuide;
@@ -13,10 +13,9 @@ import java.util.Properties;
 
 @SpringBootApplication
 public class GraphApplication {
-    public static DataGuide dataSet;
-    public static AllData allData;
+
     public static void main (String args[]) throws IOException, NoSuchFieldException, ClassNotFoundException, UnsolvedSymbolException {
-        //SpringApplication.run(GraphApplication.class, args);
+        SpringApplication.run(GraphApplication.class, args);
 
 //        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
 //        xmlFileBuilder.elementsAndAttrtoXML();

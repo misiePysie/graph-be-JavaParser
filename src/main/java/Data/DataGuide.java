@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 
 public class DataGuide {
-    private static String path = "src/main/java";
+    private static String path;
     private JavaSymbolSolver javaSymbolSolver;
     private TypeSolver typeSolver;
     private TypeSolver reflectionTypeSolver;
@@ -42,7 +42,7 @@ public class DataGuide {
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightOne;
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightTwo;
     private static HashMap<String, Set<String>> methodAndFile;
-    public AllData findModuleDependencies() throws IOException, ClassNotFoundException, NoSuchFieldException {
+    public void findModuleDependencies(AllData temp) throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.combinedTypeSolver = new CombinedTypeSolver();
         this.typeSolver = new JavaParserTypeSolver(path);
@@ -69,32 +69,43 @@ public class DataGuide {
         methodAndModuleWeightOne = new HashMap<>();
         methodAndModuleWeightTwo = new HashMap<>();
         methodAndModuleWeight = new HashMap<>();
-        allData = new AllData();
         methodAndFile = new HashMap<>();
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
 
             checkDirectory(file, clasesFiles);
         });
 
+        System.out.println(clasesFiles);
+       ArrayList<File> tempFile = new ArrayList<>();
+           for(File x: clasesFiles){
+               System.out.println(x.getName());
+               if (x.getName().contains("Application")) {
+                   tempFile.add(x);
+               }
+           }
+           System.out.println(tempFile);
+           for(int i=0;i<tempFile.size();i++) {
+               clasesFiles.remove(tempFile.get(i));
+           }
+       System.out.println(clasesFiles);
         clasesFiles.forEach(file -> {
             classesNames.add(file.getName().substring(0, file.getName().lastIndexOf(".java")));
         });
 
 
 
-     FilesConnections();
-     MethodConnections();
-     ModuleConnections();
-     MethodFileConnections();
+     this.FilesConnections(temp);
+     this.MethodConnections(temp);
+     this.ModuleConnections(temp);
+     this.MethodFileConnections();
 
-        return allData;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
     // Połączenia pomiędzy plikami File_File
 
 
-    public HashMap<String, HashMap<String,Integer>> FilesConnections(){
+    public HashMap<String, HashMap<String,Integer>> FilesConnections(AllData temp){
         //stworzenie listy plików;
         final ArrayList<JavaFile> listOfJavaFiles = new ArrayList<JavaFile>();
         addAllFilesToList(listOfJavaFiles);
@@ -144,8 +155,8 @@ public class DataGuide {
 
         });
         addAllEdgesToList(listOfEdgesFile_File, listOfJavaFiles, tempOneJavaFile, fileOneFileTwoWeight);
-        allData.setListOfJavaFiles(listOfJavaFiles);
-        allData.setListOfEdgesFile_File(listOfEdgesFile_File);
+        temp.setListOfJavaFiles(listOfJavaFiles);
+        temp.setListOfEdgesFile_File(listOfEdgesFile_File);
         System.out.println("Lista plikow:");
         listOfJavaFiles.forEach(x-> System.out.println(x));
         System.out.println("Lista krawedzi plik_plik:");
@@ -220,7 +231,7 @@ public class DataGuide {
     //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
     // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> MethodConnections(){
+    public HashMap<String, HashMap<String,Integer>> MethodConnections(AllData temp){
 
         ArrayList<Method> methodsList = new ArrayList<>();
         ArrayList<EdgeMethod_Method> methodsEdgesList = new ArrayList<>();
@@ -258,8 +269,8 @@ public class DataGuide {
 
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
-        allData.setListOfMethods(methodsList);
-        allData.setListOfEdgesMethod_Method(methodsEdgesList);
+        temp.setListOfMethods(methodsList);
+        temp.setListOfEdgesMethod_Method(methodsEdgesList);
         System.out.println("Lista metod: ");
         addMethodsToList(methodsList, methodOneMethodTwoWeight);
         //addMethodsToList(methodsList, methodsWeight);
@@ -270,7 +281,7 @@ public class DataGuide {
     }
     // Historyjka 3
     // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> ModuleConnections(){
+    public HashMap<String, HashMap<String,Integer>> ModuleConnections(AllData temp){
         ArrayList<Package> listOfPackages=new ArrayList<>();
         ArrayList<EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
         final ArrayList<Method> listOfMethods=new ArrayList<>();
@@ -359,10 +370,10 @@ public class DataGuide {
         addListOfPackages(listOfPackages,moduleOneModuleTwoWeight);
         addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
         addAllEdgesMethod_PackagesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
-        allData.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
-        allData.setListOfPackages(listOfPackages);
-        allData.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
-        allData.setListOfMethods(listOfMethods);
+        temp.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
+        temp.setListOfPackages(listOfPackages);
+        temp.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
+        temp.setListOfMethods(listOfMethods);
         System.out.println("Lista paczek:");
         listOfPackages.forEach(x-> System.out.println(x));
         System.out.println("Lista krawedzi paczka_paczka: ");

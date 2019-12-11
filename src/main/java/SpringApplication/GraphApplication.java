@@ -14,7 +14,7 @@ import java.util.Properties;
 @SpringBootApplication
 public class GraphApplication {
     public static void main (String args[]) throws IOException, NoSuchFieldException, ClassNotFoundException, UnsolvedSymbolException {
-        //SpringApplication.run(GraphApplication.class, args);
+       // SpringApplication.run(GraphApplication.class, args);
         DataGuide obj = new DataGuide();
         obj.findModuleDependencies();
 

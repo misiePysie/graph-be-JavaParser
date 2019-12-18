@@ -16,13 +16,21 @@ import java.util.*;
 
 
 public class DataGuide {
-    private static String path;
+    private static String path="src/main/java";
     private JavaSymbolSolver javaSymbolSolver;
     private TypeSolver typeSolver;
     private TypeSolver reflectionTypeSolver;
     private CombinedTypeSolver combinedTypeSolver;
     private File mainFile;
     private AllData allData;
+
+    public static HashMap<String, HashMap<String, Integer>> getMethodOneMethodTwoWeight() {
+        return methodOneMethodTwoWeight;
+    }
+
+    public static HashMap<String, HashMap<String, Integer>> getModuleOneModuleTwoWeight() {
+        return moduleOneModuleTwoWeight;
+    }
 
     private static Set<File> clasesFiles;
     private static List<String> classesNames;
@@ -51,6 +59,7 @@ public class DataGuide {
         combinedTypeSolver.add(new JarTypeSolver("jar/gson-2.8.2.jar"));
         combinedTypeSolver.add(new JarTypeSolver("jar/spring-boot-2.2.2.RELEASE.jar"));
         combinedTypeSolver.add(new JarTypeSolver("jar/java-xmlbuilder-1.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/java-util-1.8.0.jar"));
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
@@ -71,12 +80,11 @@ public class DataGuide {
             checkDirectory(file, clasesFiles);
         });
 
-        System.out.println(clasesFiles);
+
         ArrayList<File> tempFile = new ArrayList<>();
         clasesFiles.forEach(file -> {
             classesNames.add(file.getName().substring(0, file.getName().lastIndexOf(".java")));
         });
-
 
 
         this.FilesConnections(temp);
@@ -89,6 +97,14 @@ public class DataGuide {
     // Historyjka 1
     // Połączenia pomiędzy plikami File_File
 
+
+    public  HashMap<String, Integer> getFilesWeight() {
+        return filesWeight;
+    }
+
+    public  HashMap<String, HashMap<String, Integer>> getFileOneFileTwoWeight() {
+        return fileOneFileTwoWeight;
+    }
 
     public HashMap<String, HashMap<String,Integer>> FilesConnections(AllData temp){
         //stworzenie listy plików;
@@ -133,19 +149,23 @@ public class DataGuide {
 
                     //System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t File two : " + mce.resolve().getClassName()  );
                 }
-
+                else{
+                    continue;
+                }
                 fileOneFileTwoWeight.put(file.getName().substring(0, file.getName().lastIndexOf(".java")), fileTwoAndWeight);
             }
 
 
         });
+        System.out.println(fileOneFileTwoWeight);
+        System.out.println();
         addAllEdgesToList(listOfEdgesFile_File, listOfJavaFiles, tempOneJavaFile, fileOneFileTwoWeight);
         temp.setListOfJavaFiles(listOfJavaFiles);
         temp.setListOfEdgesFile_File(listOfEdgesFile_File);
-        System.out.println("Lista plikow:");
-        listOfJavaFiles.forEach(x-> System.out.println(x));
-        System.out.println("Lista krawedzi plik_plik:");
-        listOfEdgesFile_File.forEach(x-> System.out.println(x));
+        //System.out.println("Lista plikow:");
+        //listOfJavaFiles.forEach(x-> System.out.println(x));
+        //System.out.println("Lista krawedzi plik_plik:");
+        //listOfEdgesFile_File.forEach(x-> System.out.println(x));
         return fileOneFileTwoWeight;
     }
 //    public void setJavaFilesSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)

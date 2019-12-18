@@ -577,22 +577,26 @@ public class DataGuide {
         for (Map.Entry<String, Set<String>> entry : methodAndFile.entrySet()) {
 
             for (JavaFile jf : listOfJavaFiles) {
-                    if (jf.getJavaFileName().equals(entry.getKey())) {
-                        javaFile = jf; //tu mi czegoś nie tworzy chyba
-                    }
+                String[] extendedFileName = entry.getKey().split("\\.");  ///bo nazwa pliku w methodAndFile ma końcówkę .java a w listOfJavaFiles nie
+                String fileName = extendedFileName[0];
+                if (jf.getJavaFileName().equals(fileName)) {
+                    javaFile = jf;
+                }
             }
+
             Set<String> methodSet = entry.getValue();
-            for (String ms : methodSet) { //???????
+            for (String ms : methodSet) {
 
                 for (Method m : listOfMethods) {
                     if (m.getMethodName().equals(ms)) {
                         method = m;
                     }
                 }
-                EdgeMethod_File emf = new EdgeMethod_File(method, javaFile); //tworzymy edge dla kazdej metody w secie
-                if (!edgeMethodFiles.contains(emf)) {
-                    edgeMethodFiles.add(emf);
-                }
+                    EdgeMethod_File emf = new EdgeMethod_File(method, javaFile); //tworzymy edge dla kazdej metody w secie
+                    if (!edgeMethodFiles.contains(emf)) {
+                        edgeMethodFiles.add(emf);
+                    }
+
             }
 
 //cos jest nie tak z plikami

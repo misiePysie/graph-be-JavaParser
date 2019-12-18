@@ -30,6 +30,13 @@ public class JavaFile {
         this.size = size;
     }
 
+    public int getCircleSize() {
+        return circleSize;
+    }
+
+    public void setCircleSize(int circleSize) {
+        this.circleSize = circleSize;
+    }
 
     @Override
     public String toString() {

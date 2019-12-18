@@ -3,16 +3,16 @@ package Data;
 import java.util.ArrayList;
 
 public class AllData {
-    private  ArrayList<JavaFile> listOfJavaFiles;
-    private  ArrayList<EdgeFile_File> listOfEdgesFile_File;
-    private  ArrayList<Method> listOfMethods=new ArrayList<>();
+    public  ArrayList<JavaFile> listOfJavaFiles;
+    public  ArrayList<EdgeFile_File> listOfEdgesFile_File;
+    public  ArrayList<Method> listOfMethods=new ArrayList<>();
 
-    private ArrayList<Package> listOfPackages=new ArrayList<>();
+    public ArrayList<Package> listOfPackages=new ArrayList<>();
 
-    private  ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package;
-    private  ArrayList<EdgeMethod_Method> listOfEdgesMethod_Method;
+    public  ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package;
+    public  ArrayList<EdgeMethod_Method> listOfEdgesMethod_Method;
 
-    private ArrayList<EdgePackage_Package> listOfEdgesPackage_Package;
+    public ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package;
 
     public AllData() {
     }
@@ -64,11 +64,14 @@ public class AllData {
         this.listOfPackages = listOfPackages;
     }
 
-    public ArrayList<EdgePackage_Package> getListOfEdgesPackage_Package() {
+    public ArrayList<EdgeMethod_Package.EdgePackage_Package> getListOfEdgesPackage_Package() {
         return listOfEdgesPackage_Package;
     }
 
-    public void setListOfEdgesPackage_Package(ArrayList<EdgePackage_Package> listOfEdgesPackage_Package) {
+    public void setListOfEdgesPackage_Package(ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package) {
         this.listOfEdgesPackage_Package = listOfEdgesPackage_Package;
     }
+
+
+
 }

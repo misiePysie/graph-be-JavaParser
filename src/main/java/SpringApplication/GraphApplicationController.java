@@ -170,7 +170,7 @@ public class GraphApplicationController {
 
     @CrossOrigin(origins = "http://localhost:8080")
     @ResponseBody
-    @RequestMapping(path = "xml_export", method = RequestMethod.GET)
+    @RequestMapping(path = "/xml_export", method = RequestMethod.GET)
     public ResponseEntity xmlExport(@RequestBody String path) {
         Gson gson = new Gson();
         DirPath dir = gson.fromJson(path, DirPath.class);

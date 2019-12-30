@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project DocumentationType="html" ExporterVersion="12.2" Name="untitled" UmlVersion="2.x" Xml_structure="simple">
   <Models>
+    <Class Id="15" Name="ApiXmlModel"/>
     <Class Id="1" Name="DataGuide"/>
     <Class Id="2" Name="Node"/>
     <Class Id="5" Name="Method"/>
@@ -15,22 +16,24 @@
     <Class Id="7" Name="GraphApplication"/>
     <Class Id="12" Name="EdgeMethod_Method"/>
     <Class Id="9" Name="Edge"/>
-    <Usage From="1" Id="15" To="1"/>
-    <Usage From="1" Id="16" To="2"/>
-    <Usage From="1" Id="17" To="3"/>
-    <Usage From="1" Id="18" To="4"/>
-    <Usage From="1" Id="19" To="5"/>
-    <Usage From="1" Id="20" To="6"/>
-    <Usage From="2" Id="21" To="3"/>
-    <Usage From="2" Id="22" To="5"/>
-    <Usage From="2" Id="23" To="6"/>
-    <Usage From="7" Id="24" To="1"/>
-    <Usage From="7" Id="25" To="8"/>
-    <Usage From="9" Id="26" To="10"/>
-    <Usage From="9" Id="27" To="11"/>
-    <Usage From="9" Id="28" To="12"/>
-    <Usage From="13" Id="29" To="14"/>
-    <Usage From="13" Id="30" To="1"/>
-    <Usage From="13" Id="31" To="4"/>
+    <Usage From="1" Id="16" To="1"/>
+    <Usage From="1" Id="17" To="2"/>
+    <Usage From="1" Id="18" To="3"/>
+    <Usage From="1" Id="19" To="4"/>
+    <Usage From="1" Id="20" To="5"/>
+    <Usage From="1" Id="21" To="6"/>
+    <Usage From="2" Id="22" To="3"/>
+    <Usage From="2" Id="23" To="5"/>
+    <Usage From="2" Id="24" To="6"/>
+    <Usage From="7" Id="25" To="1"/>
+    <Usage From="7" Id="26" To="8"/>
+    <Usage From="9" Id="27" To="10"/>
+    <Usage From="9" Id="28" To="11"/>
+    <Usage From="9" Id="29" To="12"/>
+    <Usage From="13" Id="30" To="14"/>
+    <Usage From="13" Id="31" To="15"/>
+    <Usage From="13" Id="32" To="1"/>
+    <Usage From="13" Id="33" To="8"/>
+    <Usage From="13" Id="34" To="4"/>
   </Models>
 </Project>

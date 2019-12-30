@@ -55,7 +55,7 @@ public class XMLFileBuilder {
                 }
             }
         }
-        System.out.println(tmpIDMap);
+        //System.out.println(tmpIDMap);
 
 
         for ( Map.Entry<String,Integer> entry : tmpIDMap.entrySet()) {
@@ -68,7 +68,7 @@ public class XMLFileBuilder {
 
         for (Map.Entry<String, HashMap<String,Integer>> entry : structure.entrySet()) {
             for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
-                System.out.println("from " + entry.getKey() + "    to  " + entry2.getKey());
+                //System.out.println("from " + entry.getKey() + "    to  " + entry2.getKey());
                 builder.e("Usage")
                         .a("From", Integer.toString(tmpIDMap.get(entry.getKey())))
                         .a("Id", Integer.toString(elementID))

@@ -8,12 +8,16 @@ import Data.AllData;
 import ApiData.ApiXmlModel;
 import Data.DataGuide;
 import Export.XMLFileBuilder;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.jamesmurty.utils.XMLBuilder2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -21,16 +25,20 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Properties;
+import javax.servlet.ServletContext;
+
+import org.springframework.http.MediaType;
 
 
 @RestController
 public class GraphApplicationController {
+
+
+    @Autowired
+    private ServletContext servletContext;
 
     @CrossOrigin(origins = "http://localhost:8080")
     @ResponseBody
@@ -171,15 +179,14 @@ public class GraphApplicationController {
 
     @CrossOrigin(origins = "http://localhost:8080")
     @ResponseBody
-    @RequestMapping(path = "/xml_export", method = RequestMethod.GET)
-    public ResponseEntity xmlExport(@RequestBody String path) {
+    @RequestMapping(path = "/xml_files", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> xmlFilesDownload(@RequestBody String path) {
         Gson gson = new Gson();
         DirPath dir = gson.fromJson(path, DirPath.class);
 
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
-
-        ApiXmlModel model = new ApiXmlModel();
+        dataGuide.setPath(dir.getPath());
 
         try {
             dataGuide.findModuleDependencies(allData);
@@ -191,8 +198,6 @@ public class GraphApplicationController {
         XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
 
         File files = new File("files.xml");
-        File methods = new File("methods.xml");
-        File modules = new File("modules.xml");
 
         try {
             xmlFileBuilder.addElements(dataGuide.getFileOneFileTwoWeight());
@@ -200,73 +205,120 @@ public class GraphApplicationController {
             PrintWriter writerOne = new PrintWriter(files);
             Properties propertiesOne = xmlFileBuilder.getProperties();
             builderOne.toWriter(writerOne, propertiesOne);
-
-            xmlFileBuilder.addElements(dataGuide.getMethodOneMethodTwoWeight());
-            XMLBuilder2 builderTwo = xmlFileBuilder.getBuilder();
-            PrintWriter writerTwo = new PrintWriter(methods);
-            Properties propertiesTwo = xmlFileBuilder.getProperties();
-            builderTwo.toWriter(writerTwo, propertiesTwo);
-
-            xmlFileBuilder.addElements(dataGuide.getModuleOneModuleTwoWeight());
-            XMLBuilder2 builderThree = xmlFileBuilder.getBuilder();
-            PrintWriter writer = new PrintWriter(modules);
-            Properties propertiesThree = xmlFileBuilder.getProperties();
-            builderThree.toWriter(writer, propertiesThree);
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
         }
 
-
-        DocumentBuilderFactory documentBuilder = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = null;
-
-        Document filesXml;
-        Document methodsXml;
-        Document modulesXml;
+        InputStreamResource resource;
 
         try {
-            builder = documentBuilder.newDocumentBuilder();
-
-            filesXml = builder.parse(files);
-            methodsXml = builder.parse(methods);
-            modulesXml = builder.parse(methods);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer;
-        StringWriter writer = new StringWriter();
-
-        try {
-            transformer = factory.newTransformer();
-
-            transformer.transform(new DOMSource(filesXml), new StreamResult(writer));
-            model.setFiles(writer.toString());
-
-            writer.flush();
-
-            transformer.transform(new DOMSource(methodsXml), new StreamResult(writer));
-            model.setMethods(writer.toString());
-
-            writer.flush();
-
-            transformer.transform(new DOMSource(modulesXml), new StreamResult(writer));
-            model.setModules(writer.toString());
-
-            writer.flush();
-
-
-        } catch (TransformerException e) {
+            resource = new InputStreamResource(new FileInputStream(files));
+        } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity(gson.toJson(model), HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=files.xml")
+                .contentLength(files.length())
+                .body(resource);
+    }
 
+    @CrossOrigin(origins = "http://localhost:8080")
+    @ResponseBody
+    @RequestMapping(path = "/xml_methods", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> xmlMethodsDownload(@RequestBody String path) {
+        Gson gson = new Gson();
+        DirPath dir = gson.fromJson(path, DirPath.class);
+
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.setPath(dir.getPath());
+
+        try {
+            dataGuide.findModuleDependencies(allData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
+
+        File methods = new File("methods.xml");
+
+        try {
+            xmlFileBuilder.addElements(dataGuide.getMethodOneMethodTwoWeight());
+            XMLBuilder2 builderTwo = xmlFileBuilder.getBuilder();
+            PrintWriter writerTwo = new PrintWriter(methods);
+            Properties propertiesTwo = xmlFileBuilder.getProperties();
+            builderTwo.toWriter(writerTwo, propertiesTwo);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        InputStreamResource resource;
+
+        try {
+            resource = new InputStreamResource(new FileInputStream(methods));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=files.xml")
+                .contentLength(methods.length())
+                .body(resource);
+    }
+
+    @CrossOrigin(origins = "http://localhost:8080")
+    @ResponseBody
+    @RequestMapping(path = "/xml_modules", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> xmlModulesDownload(@RequestBody String path) {
+        Gson gson = new Gson();
+        DirPath dir = gson.fromJson(path, DirPath.class);
+
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.setPath(dir.getPath());
+
+        try {
+            dataGuide.findModuleDependencies(allData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
+
+        File modules = new File("modules.xml");
+
+        try {
+            xmlFileBuilder.addElements(dataGuide.getModuleOneModuleTwoWeight());
+            XMLBuilder2 builderThree = xmlFileBuilder.getBuilder();
+            PrintWriter writer = new PrintWriter(modules);
+            Properties propertiesThree = xmlFileBuilder.getProperties();
+            builderThree.toWriter(writer, propertiesThree);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        InputStreamResource resource;
+
+        try {
+            resource = new InputStreamResource(new FileInputStream(modules));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=files.xml")
+                .contentLength(modules.length())
+                .body(resource);
     }
 
 }

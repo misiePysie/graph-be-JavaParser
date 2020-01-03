@@ -1,12 +1,8 @@
 package Data;
-import SpringApplication.GraphApplication;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -17,18 +13,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class DataGuide {
-    private static String path = "src/main/java";
+    private static String path="src/main/java";
     private JavaSymbolSolver javaSymbolSolver;
     private TypeSolver typeSolver;
     private TypeSolver reflectionTypeSolver;
     private CombinedTypeSolver combinedTypeSolver;
     private File mainFile;
     private AllData allData;
+
+    public static HashMap<String, HashMap<String, Integer>> getMethodOneMethodTwoWeight() {
+        return methodOneMethodTwoWeight;
+    }
+
+    public static HashMap<String, HashMap<String, Integer>> getModuleOneModuleTwoWeight() {
+        return moduleOneModuleTwoWeight;
+    }
 
     private static Set<File> clasesFiles;
     private static List<String> classesNames;
@@ -42,7 +44,7 @@ public class DataGuide {
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightOne;
     private static HashMap<String,HashMap<String,Integer>> methodAndModuleWeightTwo;
     private static HashMap<String, Set<String>> methodAndFile;
-    public AllData findModuleDependencies() throws IOException, ClassNotFoundException, NoSuchFieldException {
+    public void findModuleDependencies(AllData temp) throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.combinedTypeSolver = new CombinedTypeSolver();
         this.typeSolver = new JavaParserTypeSolver(path);
@@ -55,6 +57,9 @@ public class DataGuide {
         combinedTypeSolver.add(new JarTypeSolver("jar/javaparser-symbol-solver-model-3.15.5.jar"));
         combinedTypeSolver.add(new JarTypeSolver("jar/javaparser-core-3.15.5.jar"));
         combinedTypeSolver.add(new JarTypeSolver("jar/gson-2.8.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/spring-boot-2.2.2.RELEASE.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/java-xmlbuilder-1.2.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/java-util-1.8.0.jar"));
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);
 
@@ -69,39 +74,46 @@ public class DataGuide {
         methodAndModuleWeightOne = new HashMap<>();
         methodAndModuleWeightTwo = new HashMap<>();
         methodAndModuleWeight = new HashMap<>();
-        allData = new AllData();
         methodAndFile = new HashMap<>();
         Arrays.stream(mainFile.listFiles()).forEach(file -> {
 
             checkDirectory(file, clasesFiles);
         });
 
+
+        ArrayList<File> tempFile = new ArrayList<>();
         clasesFiles.forEach(file -> {
             classesNames.add(file.getName().substring(0, file.getName().lastIndexOf(".java")));
         });
 
 
+        this.FilesConnections(temp);
+        this.MethodConnections(temp);
+        this.ModuleConnections(temp);
+        this.MethodFileConnections();
 
-     FilesConnections();
-     MethodConnections();
-     ModuleConnections();
-     MethodFileConnections();
-
-        return allData;
     }
     //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
     // Połączenia pomiędzy plikami File_File
 
 
-    public HashMap<String, HashMap<String,Integer>> FilesConnections(){
+    public  HashMap<String, Integer> getFilesWeight() {
+        return filesWeight;
+    }
+
+    public  HashMap<String, HashMap<String, Integer>> getFileOneFileTwoWeight() {
+        return fileOneFileTwoWeight;
+    }
+
+    public HashMap<String, HashMap<String,Integer>> FilesConnections(AllData temp){
         //stworzenie listy plików;
         final ArrayList<JavaFile> listOfJavaFiles = new ArrayList<JavaFile>();
         addAllFilesToList(listOfJavaFiles);
 
 
         ArrayList<EdgeFile_File> listOfEdgesFile_File = new ArrayList<EdgeFile_File>();
-       // final JavaFile tempTwoJavaFile = new JavaFile();
+        // final JavaFile tempTwoJavaFile = new JavaFile();
         final JavaFile tempOneJavaFile = new JavaFile();
 
         clasesFiles.forEach(file -> {
@@ -137,19 +149,23 @@ public class DataGuide {
 
                     //System.out.println("File one : " + file.getName().substring(0, file.getName().lastIndexOf(".java")) + "\t File two : " + mce.resolve().getClassName()  );
                 }
-
+                else{
+                    continue;
+                }
                 fileOneFileTwoWeight.put(file.getName().substring(0, file.getName().lastIndexOf(".java")), fileTwoAndWeight);
             }
 
 
         });
+        System.out.println(fileOneFileTwoWeight);
+        System.out.println();
         addAllEdgesToList(listOfEdgesFile_File, listOfJavaFiles, tempOneJavaFile, fileOneFileTwoWeight);
-        allData.setListOfJavaFiles(listOfJavaFiles);
-        allData.setListOfEdgesFile_File(listOfEdgesFile_File);
-        System.out.println("Lista plikow:");
-        listOfJavaFiles.forEach(x-> System.out.println(x));
-        System.out.println("Lista krawedzi plik_plik:");
-        listOfEdgesFile_File.forEach(x-> System.out.println(x));
+        temp.setListOfJavaFiles(listOfJavaFiles);
+        temp.setListOfEdgesFile_File(listOfEdgesFile_File);
+        //System.out.println("Lista plikow:");
+        //listOfJavaFiles.forEach(x-> System.out.println(x));
+        //System.out.println("Lista krawedzi plik_plik:");
+        //listOfEdgesFile_File.forEach(x-> System.out.println(x));
         return fileOneFileTwoWeight;
     }
 //    public void setJavaFilesSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
@@ -195,7 +211,7 @@ public class DataGuide {
                     }
                 }
                 edgeFile_file = new EdgeFile_File(temp1, temp2, weight);
-               // System.out.println(edgeFile_file);
+                // System.out.println(edgeFile_file);
                 if (!listOfEdgesFile_File.contains(edgeFile_file)) listOfEdgesFile_File.add(edgeFile_file);
             }
 
@@ -212,15 +228,15 @@ public class DataGuide {
             listOfJavaFiles.add(javaFile);
         });
         //ustawienie wartosci pod kolka
-      //setJavaFilesSizeForCircles(listOfJavaFiles);
+        //setJavaFilesSizeForCircles(listOfJavaFiles);
 
-       // listOfJavaFiles.forEach(f -> System.out.println(f));
+        // listOfJavaFiles.forEach(f -> System.out.println(f));
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
     // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> MethodConnections(){
+    public HashMap<String, HashMap<String,Integer>> MethodConnections(AllData temp){
 
         ArrayList<Method> methodsList = new ArrayList<>();
         ArrayList<EdgeMethod_Method> methodsEdgesList = new ArrayList<>();
@@ -258,8 +274,8 @@ public class DataGuide {
 
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
-        allData.setListOfMethods(methodsList);
-        allData.setListOfEdgesMethod_Method(methodsEdgesList);
+        temp.setListOfMethods(methodsList);
+        temp.setListOfEdgesMethod_Method(methodsEdgesList);
         System.out.println("Lista metod: ");
         addMethodsToList(methodsList, methodOneMethodTwoWeight);
         //addMethodsToList(methodsList, methodsWeight);
@@ -270,12 +286,12 @@ public class DataGuide {
     }
     // Historyjka 3
     // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> ModuleConnections(){
+    public HashMap<String, HashMap<String,Integer>> ModuleConnections(AllData temp){
         ArrayList<Package> listOfPackages=new ArrayList<>();
-        ArrayList<EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
+        ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
         final ArrayList<Method> listOfMethods=new ArrayList<>();
         ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package=new ArrayList<>();
-       // addListOfPackages(listOfPackages);
+        // addListOfPackages(listOfPackages);
 
         clasesFiles.forEach(file -> {
 
@@ -287,18 +303,18 @@ public class DataGuide {
             }
             boolean isAlreadyAtList=false;
             for(MethodDeclaration md:cu.findAll(MethodDeclaration.class)){
-                    if(!Objects.equals(md.resolve().getName(), null)) {
-                        String nameOfMethod = md.resolve().getName();
-                        for (Method m : listOfMethods) {
-                            if (m.getMethodName().equals(nameOfMethod)) {
-                                isAlreadyAtList = true;
-                            }
-                        }
-                        if (!isAlreadyAtList) {
-                            Method method = new Method(nameOfMethod);
-                            listOfMethods.add(method);
+                if(!Objects.equals(md.resolve().getName(), null)) {
+                    String nameOfMethod = md.resolve().getName();
+                    for (Method m : listOfMethods) {
+                        if (m.getMethodName().equals(nameOfMethod)) {
+                            isAlreadyAtList = true;
                         }
                     }
+                    if (!isAlreadyAtList) {
+                        Method method = new Method(nameOfMethod);
+                        listOfMethods.add(method);
+                    }
+                }
 
 
             }
@@ -343,11 +359,11 @@ public class DataGuide {
         });
 
         for(String key: methodAndModuleWeightOne.keySet() ){
-                if(methodAndModuleWeightTwo.containsKey(key)){
-                    methodAndModuleWeightTwo.get(key).forEach((k, v) -> methodAndModuleWeightOne.get(key).merge(k, v, Integer::sum));
-                }else{
-                    methodAndModuleWeightTwo.put(key,methodAndModuleWeightOne.get(key));
-                }
+            if(methodAndModuleWeightTwo.containsKey(key)){
+                methodAndModuleWeightTwo.get(key).forEach((k, v) -> methodAndModuleWeightOne.get(key).merge(k, v, Integer::sum));
+            }else{
+                methodAndModuleWeightTwo.put(key,methodAndModuleWeightOne.get(key));
+            }
         }
         methodAndModuleWeight.putAll(methodAndModuleWeightOne);
         // methodAndModuleWeight mapa zawierająca <Paczka,<Metoda,wagakrawedzi>>
@@ -359,10 +375,10 @@ public class DataGuide {
         addListOfPackages(listOfPackages,moduleOneModuleTwoWeight);
         addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
         addAllEdgesMethod_PackagesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
-        allData.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
-        allData.setListOfPackages(listOfPackages);
-        allData.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
-        allData.setListOfMethods(listOfMethods);
+        temp.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
+        temp.setListOfPackages(listOfPackages);
+        temp.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
+        temp.setListOfMethods(listOfMethods);
         System.out.println("Lista paczek:");
         listOfPackages.forEach(x-> System.out.println(x));
         System.out.println("Lista krawedzi paczka_paczka: ");
@@ -398,12 +414,12 @@ public class DataGuide {
 
             }
         }
-      //  listOfEdgesMethod_Package.forEach(x-> System.out.println(x));
+        //  listOfEdgesMethod_Package.forEach(x-> System.out.println(x));
 
     }
-    public void addAllEdgesPackage_PackagesToList(ArrayList<Package> listOfPackages,ArrayList<EdgePackage_Package> listOfEdgesPackage_Package,HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight)
+    public void addAllEdgesPackage_PackagesToList(ArrayList<Package> listOfPackages, ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package, HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight)
     {
-        EdgePackage_Package edgePackage_package=new EdgePackage_Package();
+        EdgeMethod_Package.EdgePackage_Package edgePackage_package=new EdgeMethod_Package.EdgePackage_Package();
         Package temp1=new Package();
         Package temp2=new Package();
 
@@ -420,12 +436,12 @@ public class DataGuide {
                         temp2=p;
                     }
                 }
-                edgePackage_package=new EdgePackage_Package(temp1,temp2,weight);
+                edgePackage_package=new EdgeMethod_Package.EdgePackage_Package(temp1,temp2,weight);
                 if(!listOfEdgesPackage_Package.contains(edgePackage_package)) listOfEdgesPackage_Package.add(edgePackage_package);
 
             }
         }
-       // listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
+        // listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
     }
     public void addListOfPackages(ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> hashMapHashMap)
     {
@@ -515,7 +531,7 @@ public class DataGuide {
                     methodFrom=methodsList.get(i);
                 }
             }
-           // methodFrom.setMethodName(entry.getKey());
+            // methodFrom.setMethodName(entry.getKey());
             Map<String, Integer> temp = entry.getValue();
             for (Map.Entry<String, Integer> entr : temp.entrySet()) {
                 Method methodTo=new Method();
@@ -574,4 +590,3 @@ public class DataGuide {
         DataGuide.path = path;
     }
 }
-

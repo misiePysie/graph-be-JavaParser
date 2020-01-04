@@ -580,7 +580,7 @@ public class DataGuide {
                 methodsInSpecificFile.add(md.resolve().getName());
             }
             if(!methodsInSpecificFile.isEmpty()){
-                methodAndFile.put(file.getName(), methodsInSpecificFile);
+                methodAndFile.put(file.getName().substring(0, file.getName().lastIndexOf(".java")), methodsInSpecificFile);
             }
         });
         return methodAndFile;

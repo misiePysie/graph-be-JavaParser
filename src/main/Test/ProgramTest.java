@@ -80,6 +80,14 @@ class ProgramTest {
     }
 
     @Test
+    void MethodFileTest() throws IOException, ClassNotFoundException, NoSuchFieldException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.MethodFileConnections();
+    }
+
+    @Test
     void XMLFilesTest() throws IOException, NoSuchFieldException, ClassNotFoundException {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();

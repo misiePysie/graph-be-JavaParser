@@ -10,6 +10,10 @@ public class EdgeMethod_File {
         this.file = file;
     }
 
+    public EdgeMethod_File() {
+
+    }
+
     public JavaFile getFile() {
         return file;
     }

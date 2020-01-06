@@ -574,7 +574,10 @@ public class DataGuide {
     public void createMethodFileEdges(ArrayList<JavaFile> listOfJavaFiles, ArrayList<Method> listOfMethods, ArrayList<EdgeMethod_File> edgeMethodFiles, HashMap<String, Set<String>> methodAndFile) {
         Method method = new Method();
         JavaFile javaFile = new JavaFile();
+        EdgeMethod_File emf;
         for (Map.Entry<String, Set<String>> entry : methodAndFile.entrySet()) {
+
+            //System.out.println(entry.getKey());
 
             for (JavaFile jf : listOfJavaFiles) {
                 String[] extendedFileName = entry.getKey().split("\\.");  ///bo nazwa pliku w methodAndFile ma końcówkę .java a w listOfJavaFiles nie
@@ -582,27 +585,28 @@ public class DataGuide {
                 if (jf.getJavaFileName().equals(fileName)) {
                     javaFile = jf;
                 }
-            }
 
+            }
             Set<String> methodSet = entry.getValue();
-            for (String ms : methodSet) {
+                for (String ms : methodSet) {
 
-                for (Method m : listOfMethods) {
-                    if (m.getMethodName().equals(ms)) {
-                        method = m;
+                  //  System.out.println(ms);
+                    for (Method m : listOfMethods) {
+                        if (m.getMethodName().equals(ms)) {
+                            method = m;
+                        }
                     }
+
                 }
-                    EdgeMethod_File emf = new EdgeMethod_File(method, javaFile); //tworzymy edge dla kazdej metody w secie
-                    if (!edgeMethodFiles.contains(emf)) {
-                        edgeMethodFiles.add(emf);
-                    }
-
+            emf = new EdgeMethod_File(method, javaFile);
+            if (!edgeMethodFiles.contains(emf)) {
+                edgeMethodFiles.add(emf);
             }
 
-//cos jest nie tak z plikami
+
         }
-        for (EdgeMethod_File emf : edgeMethodFiles) {
-            System.out.println(emf.toString());
+        for (EdgeMethod_File em : edgeMethodFiles) {
+            System.out.println(em.toString());
         }
     }
 

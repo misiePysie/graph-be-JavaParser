@@ -31,17 +31,26 @@ public class GraphApplicationController {
         Gson gson = new Gson();
         try {
             DirPath dir = gson.fromJson(path, DirPath.class);
+
+            if(!dir.getPath().endsWith("java")) {
+               throw new IllegalArgumentException();
+            }
             dataSet.setPath(dir.getPath());
             dataSet.findModuleDependencies(allData);
             dataSet.FilesConnections();
             dataSet.MethodConnections();
             dataSet.ModuleConnections();
             dataSet.MethodFileConnections();
-
-        }catch(Exception e){
+        } catch(IllegalArgumentException e){
+            e.printStackTrace();
+            return new ResponseEntity(null, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        catch(Exception e){
             e.printStackTrace();
             return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
         }
+
+
 
         return new ResponseEntity(null, HttpStatus.OK);
     }
@@ -54,6 +63,10 @@ public class GraphApplicationController {
 
         ArrayList<Node> tempNodes = new ArrayList<Node>();
         ArrayList<Edge> tempEdge = new ArrayList<Edge>();
+
+        if(allData.getListOfJavaFiles().size()==0){
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
 
         for (int i = 0; i < allData.getListOfJavaFiles().size(); i++) {
             tempNodes.add(new Node(allData.getListOfJavaFiles().get(i)));
@@ -78,6 +91,10 @@ public class GraphApplicationController {
         ArrayList<Node> tempNodes = new ArrayList<Node>();
         ArrayList<Edge> tempEdge = new ArrayList<Edge>();
 
+        if(allData.getListOfMethods().size()==0){
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
         for (int i = 0; i < allData.getListOfMethods().size(); i++) {
             tempNodes.add(new Node(allData.getListOfMethods().get(i)));
         }
@@ -100,6 +117,10 @@ public class GraphApplicationController {
 
         ArrayList<Node> tempNodes = new ArrayList<Node>();
         ArrayList<Edge> tempEdge = new ArrayList<Edge>();
+
+        if(allData.getListOfMethods().size() == 0){
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
 
         for (int i = 0; i < allData.getListOfMethods().size(); i++) {
             tempNodes.add(new Node(allData.getListOfMethods().get(i)));

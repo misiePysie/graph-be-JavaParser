@@ -169,10 +169,7 @@ public class GraphApplicationController {
             return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=files.xml")
-                .contentLength(files.length())
-                .body(resource);
+        return new ResponseEntity<>(resource,HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "http://localhost:8080")
@@ -204,10 +201,7 @@ public class GraphApplicationController {
             return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=files.xml")
-                .contentLength(methods.length())
-                .body(resource);
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "http://localhost:8080")
@@ -239,11 +233,10 @@ public class GraphApplicationController {
             return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=files.xml")
-                .contentLength(modules.length())
-                .body(resource);
+        return new ResponseEntity(resource, HttpStatus.OK);
     }
+
+
 
 }
 

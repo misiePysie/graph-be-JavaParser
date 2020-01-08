@@ -1,39 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project DocumentationType="html" ExporterVersion="12.2" Name="untitled" UmlVersion="2.x" Xml_structure="simple">
-  <Models>
-    <Class Id="189" Name="ApiXmlModel"/>
-    <Class Id="175" Name="DataGuide"/>
-    <Class Id="176" Name="Node"/>
-    <Class Id="179" Name="Method"/>
-    <Class Id="187" Name="GraphApplicationController"/>
-    <Class Id="188" Name="DirPath"/>
-    <Class Id="182" Name="XMLFileBuilder"/>
-    <Class Id="184" Name="EdgeMethod_Package"/>
-    <Class Id="177" Name="JavaFile"/>
-    <Class Id="178" Name="AllData"/>
-    <Class Id="185" Name="EdgeFile_File"/>
-    <Class Id="180" Name="Package"/>
-    <Class Id="181" Name="GraphApplication"/>
-    <Class Id="186" Name="EdgeMethod_Method"/>
-    <Class Id="183" Name="Edge"/>
-    <Usage From="175" Id="190" To="175"/>
-    <Usage From="175" Id="191" To="176"/>
-    <Usage From="175" Id="192" To="177"/>
-    <Usage From="175" Id="193" To="178"/>
-    <Usage From="175" Id="194" To="179"/>
-    <Usage From="175" Id="195" To="180"/>
-    <Usage From="176" Id="196" To="177"/>
-    <Usage From="176" Id="197" To="179"/>
-    <Usage From="176" Id="198" To="180"/>
-    <Usage From="181" Id="199" To="175"/>
-    <Usage From="181" Id="200" To="182"/>
-    <Usage From="183" Id="201" To="184"/>
-    <Usage From="183" Id="202" To="185"/>
-    <Usage From="183" Id="203" To="186"/>
-    <Usage From="187" Id="204" To="188"/>
-    <Usage From="187" Id="205" To="189"/>
-    <Usage From="187" Id="206" To="175"/>
-    <Usage From="187" Id="207" To="182"/>
-    <Usage From="187" Id="208" To="178"/>
-  </Models>
+  <Models/>
 </Project>

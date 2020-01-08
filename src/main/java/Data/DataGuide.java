@@ -95,6 +95,7 @@ public class DataGuide {
             classesNames.add(file.getName().substring(0, file.getName().lastIndexOf(".java")));
         });
 
+        MethodFileConnections();
     }
     //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
@@ -571,6 +572,11 @@ public class DataGuide {
 
     public HashMap<String,Set<String>> MethodFileConnections(){
 
+        ArrayList<JavaFile> listOfJavaFiles = new ArrayList<>();
+        ArrayList<Method> listOfDefinedMethods = new ArrayList<>();
+        ArrayList<EdgeMethod_File> listOfMethodFileEdges = new ArrayList<>();
+        addAllFilesToList(listOfJavaFiles);
+
         classesFiles.forEach(file -> {
             Set<String> methodsInSpecificFile = new HashSet<>();
             CompilationUnit cu = null;
@@ -580,6 +586,7 @@ public class DataGuide {
                 e.printStackTrace();
             }
             for (MethodDeclaration md : cu.findAll(MethodDeclaration.class)) {
+
                 HashMap<String, Integer> methodTwoAndWeight = new HashMap<>();
                 methodsInSpecificFile.add(md.resolve().getName());
             }
@@ -587,7 +594,67 @@ public class DataGuide {
                 methodAndFile.put(file.getName().substring(0, file.getName().lastIndexOf(".java")), methodsInSpecificFile);
             }
         });
+
+        createListOfDefinedMethods(listOfDefinedMethods,methodAndFile);
+        createMethodFileEdges(listOfJavaFiles,listOfDefinedMethods,listOfMethodFileEdges,methodAndFile);
         return methodAndFile;
+    }
+
+    public void createListOfDefinedMethods(ArrayList<Method> listOfDefinedMethods, HashMap<String, Set<String>> methodAndFile){
+
+        boolean isAlreadyAtList=false;
+
+        for (Map.Entry<String,Set<String>> entry : methodAndFile.entrySet()) {
+            Set<String> tmp = entry.getValue();
+
+            for(String methodName: tmp){
+                Method method = new Method(methodName,1);
+                listOfDefinedMethods.add(method);
+                //System.out.println(listOfDefinedMethods);
+            }
+        }
+        //System.out.println(listOfDefinedMethods);
+
+    }
+
+    public void createMethodFileEdges(ArrayList<JavaFile> listOfJavaFiles, ArrayList<Method> listOfMethods, ArrayList<EdgeMethod_File> edgeMethodFiles, HashMap<String, Set<String>> methodAndFile) {
+        Method method = new Method();
+        JavaFile javaFile = new JavaFile();
+        EdgeMethod_File emf = null;
+        //System.out.println("pliki: ");
+        for (Map.Entry<String, Set<String>> entry : methodAndFile.entrySet()) {
+
+           // System.out.println(entry.getKey());
+
+            for (JavaFile jf : listOfJavaFiles) {
+                if (jf.getJavaFileName().equals(entry.getKey())) {
+                    javaFile = jf;
+                }
+
+            }
+            Set<String> methodSet = entry.getValue();
+            for (String ms : methodSet) {
+
+                //System.out.println(ms);
+                for (Method m : listOfMethods) {
+                    //System.out.println(m.getMethodName());
+                    if (m.getMethodName().equals(ms)) {
+                        method = m;
+                        emf = new EdgeMethod_File(method, javaFile);
+                    }
+                }
+
+                if (!edgeMethodFiles.contains(emf)) {
+                    edgeMethodFiles.add(emf);
+                }
+
+            }
+
+
+        }
+        for (EdgeMethod_File em : edgeMethodFiles) {
+            System.out.println(em.toString());
+        }
     }
 
     public static String getPath() {
@@ -597,4 +664,5 @@ public class DataGuide {
     public static void setPath(String path) {
         DataGuide.path = path;
     }
+
 }

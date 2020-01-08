@@ -16,6 +16,7 @@ public class Method {
     public Method(String methodName, int weight) {
         this.methodName = methodName;
         this.weight = weight;
+        this.circleSize =10;
     }
 
     public String getMethodName() {

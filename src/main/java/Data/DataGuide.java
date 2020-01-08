@@ -225,7 +225,9 @@ public class DataGuide {
     public HashMap<String, HashMap<String, Integer>> MethodConnections() {
 
         ArrayList<Method> methodsList = new ArrayList<>();
+
         ArrayList<EdgeMethod_Method> methodsEdgesList = new ArrayList<>();
+
 
         clasesFiles.forEach(file -> {
 
@@ -236,6 +238,7 @@ public class DataGuide {
                 e.printStackTrace();
             }
             for (MethodDeclaration md : cu.findAll(MethodDeclaration.class)) {
+
                 HashMap<String, Integer> methodTwoAndWeight = new HashMap<>();
                 for (MethodCallExpr mce : md.findAll(MethodCallExpr.class)) {
                     if (classesNames.contains(mce.resolve().getClassName())) {
@@ -543,10 +546,10 @@ public class DataGuide {
 
     public HashMap<String, Set<String>> MethodFileConnections() {
         ArrayList<JavaFile> listOfJavaFiles = new ArrayList<>();
-        ArrayList<Method> listOfMethods = new ArrayList<>();
+        ArrayList<Method> listOfMethods = new ArrayList<>(); //todo list of DEFINED methods
         ArrayList<EdgeMethod_File> listOfMethodFileEdges = new ArrayList<>();
 
-        addMethodsToList(listOfMethods, methodOneMethodTwoWeight);
+        //addMethodsToList(listOfMethods, methodOneMethodTwoWeight); //todo zamiast tego funkcja tworząca listę zdefiniowanych metod
         addAllFilesToList(listOfJavaFiles); //????
 
         clasesFiles.forEach(file -> {
@@ -571,13 +574,17 @@ public class DataGuide {
         return methodAndFile;
     }
 
+    public void createListOfDefinedMethods(){
+
+    }
     public void createMethodFileEdges(ArrayList<JavaFile> listOfJavaFiles, ArrayList<Method> listOfMethods, ArrayList<EdgeMethod_File> edgeMethodFiles, HashMap<String, Set<String>> methodAndFile) {
         Method method = new Method();
         JavaFile javaFile = new JavaFile();
-        EdgeMethod_File emf;
+        EdgeMethod_File emf = null;
+        System.out.println("pliki: ");
         for (Map.Entry<String, Set<String>> entry : methodAndFile.entrySet()) {
 
-            //System.out.println(entry.getKey());
+            System.out.println(entry.getKey());
 
             for (JavaFile jf : listOfJavaFiles) {
                 String[] extendedFileName = entry.getKey().split("\\.");  ///bo nazwa pliku w methodAndFile ma końcówkę .java a w listOfJavaFiles nie
@@ -590,24 +597,26 @@ public class DataGuide {
             Set<String> methodSet = entry.getValue();
                 for (String ms : methodSet) {
 
-                  //  System.out.println(ms);
+                   //System.out.println(ms);
                     for (Method m : listOfMethods) {
+                        //System.out.println(m.getMethodName());
                         if (m.getMethodName().equals(ms)) {
                             method = m;
+                            emf = new EdgeMethod_File(method, javaFile);
                         }
                     }
 
+                    if (!edgeMethodFiles.contains(emf)) {
+                        edgeMethodFiles.add(emf);
                 }
-            emf = new EdgeMethod_File(method, javaFile);
-            if (!edgeMethodFiles.contains(emf)) {
-                edgeMethodFiles.add(emf);
+
             }
 
 
         }
-        for (EdgeMethod_File em : edgeMethodFiles) {
-            System.out.println(em.toString());
-        }
+//        for (EdgeMethod_File em : edgeMethodFiles) {
+//            System.out.println(em.toString());
+//        }
     }
 
 

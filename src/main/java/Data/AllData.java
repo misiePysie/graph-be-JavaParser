@@ -13,6 +13,15 @@ public class AllData {
     private  ArrayList<EdgeMethod_Method> listOfEdgesMethod_Method;
 
     private ArrayList<EdgePackage_Package> listOfEdgesPackage_Package;
+    private  ArrayList<Method> listOfDefinedMethods=new ArrayList<>();
+
+    public ArrayList<Method> getListOfDefinedMethods() {
+        return listOfDefinedMethods;
+    }
+
+    public void setListOfDefinedMethods(ArrayList<Method> listOfDefinedMethods) {
+        this.listOfDefinedMethods = listOfDefinedMethods;
+    }
 
     public AllData() {
     }

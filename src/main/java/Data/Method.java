@@ -1,11 +1,13 @@
 package Data;
 
 public class Method {
+    private String id;
     private String methodName;
     private int circleSize;
     private int weight;
 
-    public Method(String methodName) {
+    public Method(String id, String methodName) {
+        this.id = id;
         this.methodName = methodName;
         this.circleSize =10;
     }
@@ -13,7 +15,8 @@ public class Method {
     public Method() {
     }
 
-    public Method(String methodName, int weight) {
+    public Method(String id, String methodName, int weight) {
+        this.id = id;
         this.methodName = methodName;
         this.weight = weight;
         this.circleSize =10;
@@ -41,6 +44,14 @@ public class Method {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

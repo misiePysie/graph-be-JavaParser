@@ -130,8 +130,8 @@ public class GraphApplicationController {
         for (int i = 0; i < allData.getListOfPackages().size(); i++) {
             tempNodes.add(new Node(allData.getListOfPackages().get(i)));
         }
-        for (int i = 0; i < allData.getListOfEdgesFile_File().size(); i++) {
-            tempEdge.add(new Edge(allData.getListOfEdgesFile_File().get(i)));
+        for (int i = 0; i < allData.getListOfEdgesMethod_Package().size(); i++) {
+            tempEdge.add(new Edge(allData.getListOfEdgesMethod_Package().get(i)));
         }
 
         ApiData temp = new ApiData(tempNodes, tempEdge);

@@ -1,4 +1,5 @@
 package Data;
+import Common.CommonUtils;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -127,6 +128,7 @@ public class DataGuide {
                 if (file.getName().substring(0, file.getName().lastIndexOf(".java")).equals(f.getJavaFileName())) {
                     tempOneJavaFile.setJavaFileName(f.getJavaFileName());
                     tempOneJavaFile.setSize(f.getSize());
+                    tempOneJavaFile.setId(CommonUtils.randomId());
                 }
             }
 
@@ -228,7 +230,7 @@ public class DataGuide {
         classesFiles.forEach(file -> {
             int fileWeight = (int) file.length();
             //   weight.add(fileWeight);
-            JavaFile javaFile = new JavaFile(file.getName().substring(0, file.getName().lastIndexOf(".java")), fileWeight);
+            JavaFile javaFile = new JavaFile(CommonUtils.randomId(), file.getName().substring(0, file.getName().lastIndexOf(".java")), fileWeight);
             listOfJavaFiles.add(javaFile);
         });
         //ustawienie wartosci pod kolka
@@ -321,7 +323,7 @@ public class DataGuide {
                         }
                     }
                     if (!isAlreadyAtList) {
-                        Method method = new Method(nameOfMethod);
+                        Method method = new Method(CommonUtils.randomId(), nameOfMethod);
                         listOfMethods.add(method);
                     }
                 }
@@ -461,14 +463,14 @@ public class DataGuide {
             for(Package p:listOfPackages){
                 if(p.getPackageName().equals(name1)) isAlreadyAtList=true;
             }
-            if(!isAlreadyAtList) listOfPackages.add(new Package(name1,500));
+            if(!isAlreadyAtList) listOfPackages.add(new Package(CommonUtils.randomId(),name1,500));
 
             for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
                 String name2 = secondEntry.getKey();
                 for(Package p:listOfPackages){
                     if(p.getPackageName().equals(name2)) isAlreadyAtList=true;
                 }
-                if(!isAlreadyAtList) listOfPackages.add(new Package(name2,500));
+                if(!isAlreadyAtList) listOfPackages.add(new Package(CommonUtils.randomId(), name2,500));
 
             }
         }
@@ -496,7 +498,7 @@ public class DataGuide {
 
         for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
             String methodName = entry.getKey();
-            Method method = new Method(methodName);
+            Method method = new Method(CommonUtils.randomId(), methodName);
             for(Method m:methodsList){
                 if(m.getMethodName().equals(entry.getKey()))
                 {
@@ -510,7 +512,7 @@ public class DataGuide {
             Map<String, Integer> temp = entry.getValue();
             for (Map.Entry<String, Integer> entr : temp.entrySet()) {
                 String methodName1 = entr.getKey();
-                Method method1 = new Method(methodName1);
+                Method method1 = new Method(CommonUtils.randomId(), methodName1);
                 for(Method m:methodsList){
                     if(m.getMethodName().equals(entr.getKey()))
                     {
@@ -610,7 +612,7 @@ public class DataGuide {
             Set<String> tmp = entry.getValue();
 
             for(String methodName: tmp){
-                Method method = new Method(methodName,1);
+                Method method = new Method(CommonUtils.randomId(), methodName,1);
                 listOfDefinedMethods.add(method);
                 //System.out.println(listOfDefinedMethods);
             }

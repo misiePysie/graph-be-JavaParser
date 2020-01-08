@@ -1,10 +1,12 @@
 package Data;
 
 public class Package {
+    private String id;
     private String packageName;
     private int circleSize;
 
-    public Package(String packageName, int size) {
+    public Package(String id, String packageName, int size) {
+        this.id = id;
         this.packageName = packageName;
         this.circleSize = size;
     }
@@ -31,6 +33,14 @@ public class Package {
 
     public void setCircleSize(int size) {
         this.circleSize = size;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

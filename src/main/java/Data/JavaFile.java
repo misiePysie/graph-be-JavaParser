@@ -1,11 +1,22 @@
 package Data;
 
 public class JavaFile {
+    private String id;
     private String javaFileName;
     private int size;
     private int circleSize;
 
-    public JavaFile(String javaFileName, int size) {
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public JavaFile(String id, String javaFileName, int size) {
+        this.id = id;
         this.javaFileName = javaFileName;
         this.size = size;
         this.circleSize=100;

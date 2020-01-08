@@ -649,7 +649,7 @@ public class DataGuide {
     public void createMethodFileEdges(ArrayList<JavaFile> listOfJavaFiles, ArrayList<Method> listOfMethods, ArrayList<EdgeMethod_File> edgeMethodFiles, HashMap<String, Set<String>> methodAndFile) {
         Method method = new Method();
         JavaFile javaFile = new JavaFile();
-        EdgeMethod_File emf = null;
+        EdgeMethod_File emf = new EdgeMethod_File();
         //System.out.println("pliki: ");
         for (Map.Entry<String, Set<String>> entry : methodAndFile.entrySet()) {
 
@@ -661,23 +661,23 @@ public class DataGuide {
                 }
 
             }
-            Set<String> methodSet = entry.getValue();
-            for (String ms : methodSet) {
+               // for (String ms : listOfMethods) {
 
-                //System.out.println(ms);
-                for (Method m : listOfMethods) {
-                    //System.out.println(m.getMethodName());
-                    if (m.getMethodName().equals(ms)) {
-                        method = m;
-                        emf = new EdgeMethod_File(method, javaFile);
+                    //System.out.println(ms);
+                    for (Method m : listOfMethods) {
+                        //System.out.println(m.getMethodName());
+                        if (m.getMethodName().equals(entry.getValue())) {
+                            method = m;
+                        }
                     }
-                }
+                    emf = new EdgeMethod_File(method, javaFile);
 
-                if (!edgeMethodFiles.contains(emf)) {
-                    edgeMethodFiles.add(emf);
-                }
+                    if (!edgeMethodFiles.contains(emf)) {
+                        edgeMethodFiles.add(emf);
+                    }
 
-            }
+
+
 
 
         }

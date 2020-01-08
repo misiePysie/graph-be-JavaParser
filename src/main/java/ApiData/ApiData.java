@@ -11,6 +11,9 @@ public class ApiData {
         this.edges = edges;
     }
 
+    public ApiData() {
+    }
+
     public ArrayList<Node> getNodes() {
         return nodes;
     }

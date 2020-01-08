@@ -37,6 +37,10 @@ public class Node {
         this.size = 1;
         this.fileSize = temp.getCircleSize();
     }
+
+    public Node() {
+    }
+
     public String getLabel() {
         return label;
     }

@@ -3,6 +3,9 @@ package ApiData;
 public class DirPath {
     String path;
 
+    public DirPath() {
+    }
+
     public String getPath() {
         return path;
     }

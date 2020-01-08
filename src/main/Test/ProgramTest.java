@@ -1,3 +1,4 @@
+import ApiData.ApiData;
 import Data.AllData;
 import Data.DataGuide;
 import Data.JavaFile;
@@ -6,15 +7,11 @@ import com.jamesmurty.utils.XMLBuilder2;
 import javassist.NotFoundException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.util.Properties;
 
 
@@ -37,6 +34,23 @@ class ProgramTest {
         dataGuide.FilesConnections();
         Assert.assertFalse(allData.listOfEdgesFile_File.isEmpty());
     }
+    @Test
+    void MethodFileConnectionsTest() throws IOException, ClassNotFoundException,NoSuchFieldException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.methodFileConnections();
+        Assert.assertFalse(allData.listOfEdgesMethod_File.isEmpty());
+    }
+    @Test
+    void PackageConnectionsTest() throws IOException, ClassNotFoundException,NoSuchFieldException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.ModuleConnections();
+        Assert.assertFalse(allData.listOfEdgesPackage_Package.isEmpty());
+    }
+
 
     //todo: co ma sprawdzac ten test?
 //    @Test
@@ -58,14 +72,6 @@ class ProgramTest {
 
     }
 
-    @Test
-    void moduleOneModuleTwoWeightTest() throws IOException, ClassNotFoundException, NoSuchFieldException{
-        AllData allData = new AllData();
-        DataGuide dataGuide = new DataGuide();
-        dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
-        System.out.println(DataGuide.getModuleOneModuleTwoWeight());
-    }
 
     @Test
     void ModuleConnectionsTest() throws NoSuchFieldException, IOException, ClassNotFoundException {
@@ -75,6 +81,36 @@ class ProgramTest {
         dataGuide.ModuleConnections();
         Assert.assertFalse(allData.listOfEdgesPackage_Package.isEmpty());
 
+    }
+    @Test
+    void MethodsModuleConnectionsTest() throws NoSuchFieldException, IOException, ClassNotFoundException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.ModuleConnections();
+        Assert.assertFalse(allData.listOfEdgesMethod_Package.isEmpty());
+
+    }
+    @Test
+    void ModuleTest() throws NoSuchFieldException, IOException, ClassNotFoundException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.ModuleConnections();
+        Assert.assertFalse(allData.listOfPackages.isEmpty());
+
+    }
+    @Test
+    void ApiDataGetEdgesNotNull()
+    {
+        ApiData apiData=new ApiData();
+        Assert.assertNotNull(apiData.getEdges());
+    }
+    @Test
+    void ApiDataGetNodesNotNull()
+    {
+        ApiData apiData=new ApiData();
+        Assert.assertNotNull(apiData.getNodes());
     }
 
     @Test
@@ -108,43 +144,46 @@ class ProgramTest {
      }
 
 
-//    @Test
-//    void XMLFilesTest() throws IOException, NoSuchFieldException, ClassNotFoundException {
-//        AllData allData = new AllData();
-//        DataGuide dataGuide = new DataGuide();
-//        dataGuide.findModuleDependencies(allData);
-//        dataGuide.FilesConnections();
-//        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
-//        xmlFileBuilder.addElements(dataGuide.getFileOneFileTwoWeight());
-//        XMLBuilder2 builderOne = xmlFileBuilder.getBuilder();
-//        PrintWriter writerOne = new PrintWriter("files.xml");
-//        Properties propertiesOne = xmlFileBuilder.getProperties();
-//        builderOne.toWriter(writerOne, propertiesOne);
-//    }
-//    @Test
-//    void XMLFilesMethods() throws IOException, NoSuchFieldException, ClassNotFoundException {
-//        AllData allData = new AllData();
-//        DataGuide dataGuide = new DataGuide();
-//        dataGuide.findModuleDependencies(allData);
-//        dataGuide.MethodConnections();
-//        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
-//        xmlFileBuilder.addElements(dataGuide.getMethodOneMethodTwoWeight());
-//        XMLBuilder2 builderTwo = xmlFileBuilder.getBuilder();
-//        PrintWriter writerTwo = new PrintWriter("methods.xml");
-//        Properties propertiesTwo = xmlFileBuilder.getProperties();
-//        builderTwo.toWriter(writerTwo, propertiesTwo);
-//    }
-//    @Test
-//    void XMLFilesModules() throws IOException, NoSuchFieldException, ClassNotFoundException {
-//        AllData allData = new AllData();
-//        DataGuide dataGuide = new DataGuide();
-//        dataGuide.findModuleDependencies(allData);
-//        dataGuide.ModuleConnections();
-//        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
-//        xmlFileBuilder.addElements(dataGuide.getModuleOneModuleTwoWeight());
-//        XMLBuilder2 builderThree = xmlFileBuilder.getBuilder();
-//        PrintWriter writer = new PrintWriter("modules.xml");
-//        Properties propertiesThree = xmlFileBuilder.getProperties();
-//        builderThree.toWriter(writer, propertiesThree);
-//    }
+    @Test
+    void XMLFilesTest() throws IOException, NoSuchFieldException, ClassNotFoundException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.FilesConnections();
+        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
+        xmlFileBuilder.addElements(dataGuide.getFileOneFileTwoWeight());
+        XMLBuilder2 builderOne = xmlFileBuilder.getBuilder();
+        PrintWriter writerOne = new PrintWriter("files.xml");
+        Properties propertiesOne = xmlFileBuilder.getProperties();
+        builderOne.toWriter(writerOne, propertiesOne);
+        Assert.assertNotNull(builderOne);
+    }
+    @Test
+    void XMLFilesMethods() throws IOException, NoSuchFieldException, ClassNotFoundException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.MethodConnections();
+        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
+        xmlFileBuilder.addElements(dataGuide.getMethodOneMethodTwoWeight());
+        XMLBuilder2 builderTwo = xmlFileBuilder.getBuilder();
+        PrintWriter writerTwo = new PrintWriter("methods.xml");
+        Properties propertiesTwo = xmlFileBuilder.getProperties();
+        builderTwo.toWriter(writerTwo, propertiesTwo);
+        Assert.assertNotNull(builderTwo);
+    }
+    @Test
+    void XMLFilesModules() throws IOException, NoSuchFieldException, ClassNotFoundException {
+        AllData allData = new AllData();
+        DataGuide dataGuide = new DataGuide();
+        dataGuide.findModuleDependencies(allData);
+        dataGuide.ModuleConnections();
+        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
+        xmlFileBuilder.addElements(dataGuide.getModuleOneModuleTwoWeight());
+        XMLBuilder2 builderThree = xmlFileBuilder.getBuilder();
+        PrintWriter writer = new PrintWriter("modules.xml");
+        Properties propertiesThree = xmlFileBuilder.getProperties();
+        builderThree.toWriter(writer, propertiesThree);
+        Assert.assertNotNull(builderThree);
+    }
 }

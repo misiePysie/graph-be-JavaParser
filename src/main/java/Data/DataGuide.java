@@ -535,38 +535,63 @@ public class DataGuide {
 
     public void addMethodsEdgesToList(ArrayList<EdgeMethod_Method> methodsEdgesList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight,ArrayList<Method> methodsList) {
 
-        for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
-            Method methodFrom = new Method();
-            for(int i=0;i<methodsList.size();i++)
-            {
-                if(methodsList.get(i).getMethodName().equals(entry.getKey()))
-                {
-                    methodFrom=methodsList.get(i);
+//        for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
+//            Method methodFrom = new Method();
+//            for(int i=0;i<methodsList.size();i++)
+//            {
+//                if(methodsList.get(i).getMethodName().equals(entry.getKey()))
+//                {
+//                    methodFrom=methodsList.get(i);
+//                }
+//            }
+//            // methodFrom.setMethodName(entry.getKey());
+//            Map<String, Integer> temp = entry.getValue();
+//            for (Map.Entry<String, Integer> entr : temp.entrySet()) {
+//                Method methodTo=new Method();
+//                int edgeWeight;
+//                for(int i=0;i<methodsList.size();i++)
+//                {
+//                    if(methodsList.get(i).getMethodName().equals(entr.getKey()))
+//                    {
+//                        methodTo=methodsList.get(i);
+//                    }
+//                }
+//                //methodTo.setMethodName(entr.getKey());
+//                edgeWeight=entr.getValue();
+//                EdgeMethod_Method edge=new EdgeMethod_Method(methodFrom,methodTo,edgeWeight);
+//                methodsEdgesList.add(edge);
+//            }
+//
+//        }
+//        for(EdgeMethod_Method emm:methodsEdgesList){
+//           // System.out.println(emm);
+//        }
+        EdgeMethod_Method edgeMethod_method=new EdgeMethod_Method();
+        Method temp1=new Method();
+        Method temp2=new Method();
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : methodOneMethodTwoWeight.entrySet()) {
+            String name1=firstEntry.getKey();
+            for(Method method:methodsList) {
+                if (method.getMethodName().equals(name1)) {
+                    temp1 = method;
                 }
             }
-            // methodFrom.setMethodName(entry.getKey());
-            Map<String, Integer> temp = entry.getValue();
-            for (Map.Entry<String, Integer> entr : temp.entrySet()) {
-                Method methodTo=new Method();
-                int edgeWeight;
-                for(int i=0;i<methodsList.size();i++)
-                {
-                    if(methodsList.get(i).getMethodName().equals(entr.getKey()))
-                    {
-                        methodTo=methodsList.get(i);
+
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                Integer weight = secondEntry.getValue();
+                for (Method method : methodsList) {
+                    if (method.getMethodName().equals(name2)) {
+                        temp2 = method;
                     }
                 }
-                //methodTo.setMethodName(entr.getKey());
-                edgeWeight=entr.getValue();
-                EdgeMethod_Method edge=new EdgeMethod_Method(methodFrom,methodTo,edgeWeight);
-                methodsEdgesList.add(edge);
+                edgeMethod_method = new EdgeMethod_Method(temp1, temp2, weight);
+                // System.out.println(edgeFile_file);
+                if (!methodsEdgesList.contains(edgeMethod_method)) methodsEdgesList.add(edgeMethod_method);
             }
 
-        }
-        for(EdgeMethod_Method emm:methodsEdgesList){
-           // System.out.println(emm);
-        }
 
+        }
 
     }
 

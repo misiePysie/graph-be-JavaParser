@@ -6,15 +6,19 @@ import com.jamesmurty.utils.XMLBuilder2;
 import javassist.NotFoundException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-class ProgramTest {
 
+class ProgramTest {
 
     @Test
     void FilesNamesTest() throws IOException, ClassNotFoundException, NoSuchFieldException{
@@ -102,6 +106,7 @@ class ProgramTest {
          }
 
      }
+
 
 //    @Test
 //    void XMLFilesTest() throws IOException, NoSuchFieldException, ClassNotFoundException {

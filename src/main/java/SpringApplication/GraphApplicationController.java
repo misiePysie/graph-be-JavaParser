@@ -12,6 +12,7 @@ import com.jamesmurty.utils.XMLBuilder2;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
@@ -28,6 +29,7 @@ public class GraphApplicationController {
     @ResponseBody
     @RequestMapping(path= "/path", method = RequestMethod.POST)
     public ResponseEntity setPath(@RequestBody String path){
+
         Gson gson = new Gson();
         try {
             DirPath dir = gson.fromJson(path, DirPath.class);

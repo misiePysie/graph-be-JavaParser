@@ -275,16 +275,17 @@ public class DataGuide {
 
             }
         });
-
+        methodsList=addMethodsToList(methodsList, methodOneMethodTwoWeight);
+        addMethodsEdgesToList(methodsEdgesList,methodOneMethodTwoWeight,methodsList);
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
         this.allData.setListOfMethods(methodsList);
         this.allData.setListOfEdgesMethod_Method(methodsEdgesList);
         //System.out.println("Lista metod: ");
-        addMethodsToList(methodsList, methodOneMethodTwoWeight);
+
         //addMethodsToList(methodsList, methodsWeight);
         //System.out.println("Lista krawedzi metoda_metoda: ");
-        addMethodsEdgesToList(methodsEdgesList,methodOneMethodTwoWeight,methodsList);
+
 
         return methodOneMethodTwoWeight;
     }
@@ -490,7 +491,7 @@ public class DataGuide {
         }
     }
 
-    public void addMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight) {
+    public ArrayList<Method> addMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight) {
         boolean isAlreadyAtList=false;
 
         for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
@@ -527,6 +528,7 @@ public class DataGuide {
         for (Method m : methodsList) {
            // System.out.println(m);
         }
+        return methodsList;
     }
 
     public void addMethodsEdgesToList(ArrayList<EdgeMethod_Method> methodsEdgesList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight,ArrayList<Method> methodsList) {

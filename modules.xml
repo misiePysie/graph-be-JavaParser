@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project DocumentationType="html" ExporterVersion="12.2" Name="untitled" UmlVersion="2.x" Xml_structure="simple">
-  <Models/>
+  <Models>
+    <Class Id="125" Name="SpringApplication"/>
+    <Class Id="126" Name="Export"/>
+    <Class Id="127" Name="Data"/>
+    <Class Id="129" Name="com.github.javaparser.ast"/>
+    <Class Id="128" Name="ApiData"/>
+    <Usage From="125" Id="130" To="126"/>
+    <Usage From="125" Id="131" To="127"/>
+    <Usage From="125" Id="132" To="128"/>
+    <Usage From="127" Id="133" To="127"/>
+    <Usage From="127" Id="134" To="129"/>
+  </Models>
 </Project>

@@ -95,7 +95,7 @@ public class DataGuide {
             classesNames.add(file.getName().substring(0, file.getName().lastIndexOf(".java")));
         });
 
-        MethodFileConnections();
+
     }
     //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
@@ -570,7 +570,7 @@ public class DataGuide {
     // Połczenia Metoda -> Plik
     // methodAndFile return hashMap<String fileName, Set<String methods>>
 
-    public HashMap<String,Set<String>> MethodFileConnections(){
+    public HashMap<String,Set<String>> methodFileConnections(){
 
         ArrayList<JavaFile> listOfJavaFiles = new ArrayList<>();
         ArrayList<Method> listOfDefinedMethods = new ArrayList<>();
@@ -655,6 +655,7 @@ public class DataGuide {
         for (EdgeMethod_File em : edgeMethodFiles) {
             System.out.println(em.toString());
         }
+        allData.getListOfEdgesMethod_File().addAll(edgeMethodFiles);
     }
 
     public static String getPath() {

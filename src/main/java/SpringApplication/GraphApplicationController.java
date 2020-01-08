@@ -40,7 +40,7 @@ public class GraphApplicationController {
             dataSet.FilesConnections();
             dataSet.MethodConnections();
             dataSet.ModuleConnections();
-            dataSet.MethodFileConnections();
+            dataSet.methodFileConnections();
         } catch(IllegalArgumentException e){
             e.printStackTrace();
             return new ResponseEntity(null, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -257,6 +257,35 @@ public class GraphApplicationController {
     }
 
 
+    @CrossOrigin(origins = "http://localhost:8080")
+    @ResponseBody
+    @RequestMapping(path="/file_method", method = RequestMethod.GET)
+    public ResponseEntity filesMethods(){
+        Gson gson = new Gson();
+
+        ArrayList<Edge> tempEdges = new ArrayList<>();
+        ArrayList<Node> tempNodes = new ArrayList<>();
+
+        if(allData.getListOfMethods().size() == 0 || allData.getListOfEdgesMethod_File().size() ==0 ){
+            return new ResponseEntity(null, HttpStatus.BAD_REQUEST);
+        }
+
+        for(int i=0;i<allData.getListOfJavaFiles().size();i++){
+            tempNodes.add(new Node(allData.getListOfJavaFiles().get(i)));
+        }
+
+        for(int i = 0;i<allData.getListOfMethods().size();i++){
+            tempNodes.add(new Node(allData.getListOfMethods().get(i)));
+        }
+
+        for (int i = 0; i<allData.getListOfEdgesMethod_File().size();i++){
+            tempEdges.add(new Edge(allData.getListOfEdgesMethod_File().get(i)));
+        }
+
+        ApiData response = new ApiData(tempNodes, tempEdges);
+
+        return new ResponseEntity(gson.toJson(response), HttpStatus.OK);
+    }
 
 }
 

@@ -17,10 +17,10 @@ import java.util.Properties;
 public class GraphApplication {
 
     public static void main (String args[]) throws IOException, NoSuchFieldException, ClassNotFoundException, UnsolvedSymbolException {
-        //SpringApplication.run(GraphApplication.class, args);
-        AllData allData = new AllData();
-        DataGuide dataGuide = new DataGuide();
-        dataGuide.findModuleDependencies(allData);
+        SpringApplication.run(GraphApplication.class, args);
+//        AllData allData = new AllData();
+//        DataGuide dataGuide = new DataGuide();
+//        dataGuide.findModuleDependencies(allData);
 
 //        XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
 //        xmlFileBuilder.addElements(dataGuide.getFileOneFileTwoWeight());

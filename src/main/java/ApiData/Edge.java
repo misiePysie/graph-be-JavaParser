@@ -1,6 +1,7 @@
 package ApiData;
 
 import Data.EdgeFile_File;
+import Data.EdgeMethod_File;
 import Data.EdgeMethod_Method;
 import Data.EdgeMethod_Package;
 
@@ -48,5 +49,11 @@ public class Edge {
     public Edge(EdgeMethod_Package.EdgePackage_Package temp){
         this.from = new Node(temp.getPackageFrom());
         this.to = new Node(temp.getPackageTo());
+    }
+
+    public Edge(EdgeMethod_File temp){
+        this.from = new Node(temp.getMethod());
+        this.to = new Node(temp.getFile());
+
     }
 }

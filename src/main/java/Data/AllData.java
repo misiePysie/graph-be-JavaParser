@@ -14,6 +14,17 @@ public class AllData {
 
     public ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package;
 
+    public ArrayList<EdgeMethod_File> listOfEdgesMethod_File = new ArrayList<>();
+
+
+    public ArrayList<EdgeMethod_File> getListOfEdgesMethod_File() {
+        return listOfEdgesMethod_File;
+    }
+
+    public void setListOfEdgesMethod_File(ArrayList<EdgeMethod_File> listOfEdgesMethod_File) {
+        this.listOfEdgesMethod_File = listOfEdgesMethod_File;
+    }
+
     public AllData() {
     }
     public ArrayList<JavaFile> getListOfJavaFiles() {

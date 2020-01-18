@@ -55,6 +55,7 @@ public class JavaFile {
                 "javaFileName='" + javaFileName + '\'' +
                 ", size=" + size +
                 ", circleSize="+ circleSize+
+                ", id="+ id+
                 '}';
     }
 }

@@ -128,7 +128,11 @@ public class DataGuide {
                 if (file.getName().substring(0, file.getName().lastIndexOf(".java")).equals(f.getJavaFileName())) {
                     tempOneJavaFile.setJavaFileName(f.getJavaFileName());
                     tempOneJavaFile.setSize(f.getSize());
-                    tempOneJavaFile.setId(CommonUtils.randomId());
+                    try {
+                        tempOneJavaFile.setId(file.getCanonicalFile().toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -230,7 +234,12 @@ public class DataGuide {
         classesFiles.forEach(file -> {
             int fileWeight = (int) file.length();
             //   weight.add(fileWeight);
-            JavaFile javaFile = new JavaFile(CommonUtils.randomId(), file.getName().substring(0, file.getName().lastIndexOf(".java")), fileWeight);
+            JavaFile javaFile = null;
+            try {
+                javaFile = new JavaFile(file.getCanonicalPath().toString(), file.getName().substring(0, file.getName().lastIndexOf(".java")), fileWeight);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             listOfJavaFiles.add(javaFile);
         });
         //ustawienie wartosci pod kolka
@@ -246,7 +255,7 @@ public class DataGuide {
 
         ArrayList<Method> methodsList = new ArrayList<>();
         ArrayList<EdgeMethod_Method> methodsEdgesList = new ArrayList<>();
-
+        HashMap<String,String> tempListOfMethod=new HashMap<>();
         classesFiles.forEach(file -> {
 
             CompilationUnit cu = null;
@@ -256,6 +265,7 @@ public class DataGuide {
                 e.printStackTrace();
             }
             for (MethodDeclaration md : cu.findAll(MethodDeclaration.class)) {
+                tempListOfMethod.put(md.resolve().getName(),file.getPath());
                 HashMap<String, Integer> methodTwoAndWeight = new HashMap<>();
                 for (MethodCallExpr mce : md.findAll(MethodCallExpr.class)) {
                     if (classesNames.contains(mce.resolve().getClassName())) {
@@ -277,7 +287,7 @@ public class DataGuide {
 
             }
         });
-        methodsList=addMethodsToList(methodsList, methodOneMethodTwoWeight);
+        methodsList=addMethodsToList(methodsList, methodOneMethodTwoWeight,tempListOfMethod);
         addMethodsEdgesToList(methodsEdgesList,methodOneMethodTwoWeight,methodsList);
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
@@ -304,6 +314,8 @@ public class DataGuide {
         final ArrayList<Method> listOfMethods=new ArrayList<>();
         ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package=new ArrayList<>();
         // addListOfPackages(listOfPackages);
+        int iter=0;
+
 
         classesFiles.forEach(file -> {
 
@@ -317,18 +329,25 @@ public class DataGuide {
             for(MethodDeclaration md:cu.findAll(MethodDeclaration.class)){
                 if(!Objects.equals(md.resolve().getName(), null)) {
                     String nameOfMethod = md.resolve().getName();
+
+                    //String nameOfClass=md.resolve().getClassName();
+                    String pathToClass= null;
+                    pathToClass = file.getPath();
+                    String pathToMethod=pathToClass+"\\"+nameOfMethod;
+                    System.out.println("Name of method: "+nameOfMethod);
+                    System.out.println("Path to class: "+pathToClass);
+                    System.out.println("Path to method: "+pathToMethod);
+
                     for (Method m : listOfMethods) {
                         if (m.getMethodName().equals(nameOfMethod)) {
                             isAlreadyAtList = true;
                         }
                     }
                     if (!isAlreadyAtList) {
-                        Method method = new Method(CommonUtils.randomId(), nameOfMethod);
+                        Method method = new Method(pathToMethod, nameOfMethod);
                         listOfMethods.add(method);
                     }
                 }
-
-
             }
             HashMap<String,Integer> moduleTwoAndWeight = new HashMap<>();
             HashMap<String,Integer> methodTwoAndWeight = new HashMap<>();
@@ -493,12 +512,13 @@ public class DataGuide {
         }
     }
 
-    public ArrayList<Method> addMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight) {
+    public ArrayList<Method> addMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight,HashMap<String,String> tempListOfMethods) {
         boolean isAlreadyAtList=false;
 
         for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
             String methodName = entry.getKey();
-            Method method = new Method(CommonUtils.randomId(), methodName);
+            String pathToMethod=tempListOfMethods.get(methodName);
+            Method method = new Method(pathToMethod, methodName);
             for(Method m:methodsList){
                 if(m.getMethodName().equals(entry.getKey()))
                 {
@@ -512,7 +532,8 @@ public class DataGuide {
             Map<String, Integer> temp = entry.getValue();
             for (Map.Entry<String, Integer> entr : temp.entrySet()) {
                 String methodName1 = entr.getKey();
-                Method method1 = new Method(CommonUtils.randomId(), methodName1);
+                pathToMethod=tempListOfMethods.get(methodName1);
+                Method method1 = new Method(pathToMethod, methodName1);
                 for(Method m:methodsList){
                     if(m.getMethodName().equals(entr.getKey()))
                     {

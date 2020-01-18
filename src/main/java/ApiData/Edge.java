@@ -15,21 +15,6 @@ public class Edge {
         this.to = to;
     }
 
-    public Node getFrom() {
-        return from;
-    }
-
-    public void setFrom(Node from) {
-        this.from = from;
-    }
-
-    public Node getTo() {
-        return to;
-    }
-
-    public void setTo(Node to) {
-        this.to = to;
-    }
 
     public Edge(EdgeFile_File temp){
         this.from = new Node(temp.getFileFrom());

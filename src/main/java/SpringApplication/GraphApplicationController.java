@@ -19,11 +19,14 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
-
+@Controller
 @RestController
 public class GraphApplicationController {
     AllData allData = new AllData();
     DataGuide dataSet = new DataGuide();
+
+    public GraphApplicationController() {
+    }
 
     @CrossOrigin(origins = "http://localhost:8080")
     @ResponseBody

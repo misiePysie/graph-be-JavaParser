@@ -1,5 +1,4 @@
 package Data;
-import Common.CommonUtils;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -48,7 +47,7 @@ public class DataGuide {
     public static List<String> getClassesNames() {
         return classesNames;
     }
-
+    //metoda wywoływana na poczatku tylko raz
     public void findModuleDependencies(AllData allData) throws IOException, ClassNotFoundException, NoSuchFieldException {
 
         this.allData = allData;
@@ -98,20 +97,12 @@ public class DataGuide {
 
 
     }
+
     //----------------------------------------------------------------------------------------------------------------------------
     // Historyjka 1
-    // Połączenia pomiędzy plikami File_File
+    // Połączenia pomiędzy plikami /file_file
 
-
-    public  HashMap<String, Integer> getFilesWeight() {
-        return filesWeight;
-    }
-
-    public  HashMap<String, HashMap<String, Integer>> getFileOneFileTwoWeight() {
-        return fileOneFileTwoWeight;
-    }
-
-    public HashMap<String, HashMap<String,Integer>> FilesConnections(){
+    public HashMap<String, HashMap<String,Integer>> fileToFileConnection(){
         //stworzenie listy plików;
         final ArrayList<JavaFile> listOfJavaFiles = new ArrayList<JavaFile>();
         addAllFilesToList(listOfJavaFiles);
@@ -169,7 +160,7 @@ public class DataGuide {
         });
 //        System.out.println(fileOneFileTwoWeight);
 //        System.out.println();
-        addAllEdgesToList(listOfEdgesFile_File, listOfJavaFiles, tempOneJavaFile, fileOneFileTwoWeight);
+        addFileToFileEdgesToList(listOfEdgesFile_File, listOfJavaFiles, tempOneJavaFile, fileOneFileTwoWeight);
         this.allData.setListOfJavaFiles(listOfJavaFiles);
         this.allData.setListOfEdgesFile_File(listOfEdgesFile_File);
         //System.out.println("Lista plikow:");
@@ -178,28 +169,12 @@ public class DataGuide {
         //listOfEdgesFile_File.forEach(x-> System.out.println(x));
         return fileOneFileTwoWeight;
     }
-//    public void setJavaFilesSizeForCircles(ArrayList<JavaFile> listOfJavaFiles)
-//    {
-//        double max=-1;
-//
-//        int index=-1;
-//        for (int i = 0; i< listOfJavaFiles.size(); i++)
-//        {
-//            if(listOfJavaFiles.get(i).getSize()>max) {
-//                max = listOfJavaFiles.get(i).getSize();
-//                index = i;
-//            }
-//        }
-//        listOfJavaFiles.get(index).setSize(100);
-//        int val = 0;
-//        for (int i = 0; i < listOfJavaFiles.size(); i++) {
-//            val = (int) ((listOfJavaFiles.get(i).getSize() * 100) / max);
-//            listOfJavaFiles.get(i).setSize(val);
-//        }
-//
-//    }
 
-    public void addAllEdgesToList(ArrayList<EdgeFile_File> listOfEdgesFile_File, ArrayList<JavaFile> listOFJavaFiles, JavaFile fileOne, HashMap<String,HashMap<String, Integer>> fileOneFileTwoWeight ) {
+    public  HashMap<String, HashMap<String, Integer>> getFileOneFileTwoWeight() {
+        return fileOneFileTwoWeight;
+    }
+
+    public void addFileToFileEdgesToList(ArrayList<EdgeFile_File> listOfEdgesFile_File, ArrayList<JavaFile> listOFJavaFiles, JavaFile fileOne, HashMap<String,HashMap<String, Integer>> fileOneFileTwoWeight ) {
 
         EdgeFile_File edgeFile_file=new EdgeFile_File();
         JavaFile temp1=new JavaFile();
@@ -250,8 +225,8 @@ public class DataGuide {
 
     //-------------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 2
-    // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> MethodConnections(){
+    // Połączenia pomiędzy metodami /method_method
+    public HashMap<String, HashMap<String,Integer>> methodToMethodConnection(){
 
         ArrayList<Method> methodsList = new ArrayList<>();
         ArrayList<EdgeMethod_Method> methodsEdgesList = new ArrayList<>();
@@ -287,8 +262,8 @@ public class DataGuide {
 
             }
         });
-        methodsList=addMethodsToList(methodsList, methodOneMethodTwoWeight,tempListOfMethod);
-        addMethodsEdgesToList(methodsEdgesList,methodOneMethodTwoWeight,methodsList);
+        methodsList= addAllMethodsToList(methodsList, methodOneMethodTwoWeight,tempListOfMethod);
+        addMethodToMethodEdgesToList(methodsEdgesList,methodOneMethodTwoWeight,methodsList);
         // Mapa methodsWeight zwraca metode i ilosc jej wywołan czyli wagę wezła
         // Zwraca HashMap<String metoda1,<String metoda 2,Integer waga_krawędzi)
         this.allData.setListOfMethods(methodsList);
@@ -302,13 +277,115 @@ public class DataGuide {
         return methodOneMethodTwoWeight;
     }
 
-    public AllData getAllData() {
-        return allData;
+    public ArrayList<Method> addAllMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight, HashMap<String,String> tempListOfMethods) {
+        boolean isAlreadyAtList=false;
+
+        for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
+            String methodName = entry.getKey();
+            String pathToMethod=tempListOfMethods.get(methodName);
+            Method method = new Method(pathToMethod, methodName);
+            for(Method m:methodsList){
+                if(m.getMethodName().equals(entry.getKey()))
+                {
+                    isAlreadyAtList=true;
+                }
+            }
+            if(!isAlreadyAtList){
+                methodsList.add(method);
+            }
+            isAlreadyAtList=false;
+            Map<String, Integer> temp = entry.getValue();
+            for (Map.Entry<String, Integer> entr : temp.entrySet()) {
+                String methodName1 = entr.getKey();
+                pathToMethod=tempListOfMethods.get(methodName1);
+                Method method1 = new Method(pathToMethod, methodName1);
+                for(Method m:methodsList){
+                    if(m.getMethodName().equals(entr.getKey()))
+                    {
+                        isAlreadyAtList=true;
+                    }
+                }
+                if(!isAlreadyAtList) {
+                    methodsList.add(method1);
+                }
+            }
+            isAlreadyAtList=false;
+        }
+
+
+        for (Method m : methodsList) {
+            // System.out.println(m);
+        }
+        return methodsList;
     }
 
+    public void addMethodToMethodEdgesToList(ArrayList<EdgeMethod_Method> methodsEdgesList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight, ArrayList<Method> methodsList) {
+
+//        for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
+//            Method methodFrom = new Method();
+//            for(int i=0;i<methodsList.size();i++)
+//            {
+//                if(methodsList.get(i).getMethodName().equals(entry.getKey()))
+//                {
+//                    methodFrom=methodsList.get(i);
+//                }
+//            }
+//            // methodFrom.setMethodName(entry.getKey());
+//            Map<String, Integer> temp = entry.getValue();
+//            for (Map.Entry<String, Integer> entr : temp.entrySet()) {
+//                Method methodTo=new Method();
+//                int edgeWeight;
+//                for(int i=0;i<methodsList.size();i++)
+//                {
+//                    if(methodsList.get(i).getMethodName().equals(entr.getKey()))
+//                    {
+//                        methodTo=methodsList.get(i);
+//                    }
+//                }
+//                //methodTo.setMethodName(entr.getKey());
+//                edgeWeight=entr.getValue();
+//                EdgeMethod_Method edge=new EdgeMethod_Method(methodFrom,methodTo,edgeWeight);
+//                methodsEdgesList.add(edge);
+//            }
+//
+//        }
+//        for(EdgeMethod_Method emm:methodsEdgesList){
+//           // System.out.println(emm);
+//        }
+        EdgeMethod_Method edgeMethod_method=new EdgeMethod_Method();
+        Method temp1=new Method();
+        Method temp2=new Method();
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : methodOneMethodTwoWeight.entrySet()) {
+            String name1=firstEntry.getKey();
+            for(Method method:methodsList) {
+                if (method.getMethodName().equals(name1)) {
+                    temp1 = method;
+                    temp1.setId(method.getId());
+                }
+            }
+
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                Integer weight = secondEntry.getValue();
+                for (Method method : methodsList) {
+                    if (method.getMethodName().equals(name2)) {
+                        temp2 = method;
+                        temp2.setId(method.getId());
+                    }
+                }
+                edgeMethod_method = new EdgeMethod_Method(temp1, temp2, weight);
+                // System.out.println(edgeFile_file);
+                if (!methodsEdgesList.contains(edgeMethod_method)) methodsEdgesList.add(edgeMethod_method);
+            }
+
+
+        }
+
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 3
-    // Połączenia pomiędzy metodami
-    public HashMap<String, HashMap<String,Integer>> ModuleConnections(){
+    // Połączenia pomiędzy paczkami /package_package  i pomiedzy metodami, a paczkami /method_package
+    public HashMap<String, HashMap<String,Integer>> packageToPackageConnection(){
         ArrayList<Package> listOfPackages=new ArrayList<>();
         ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
         final ArrayList<Method> listOfMethods=new ArrayList<>();
@@ -400,29 +477,69 @@ public class DataGuide {
             }
         }
         methodAndModuleWeight.putAll(methodAndModuleWeightOne);
-        // methodAndModuleWeight mapa zawierająca <Paczka,<Metoda,wagakrawedzi>>
-        // moduleOneModuleTwoWeight mapa zawierajaca<Paczka1,<Paczka2, waga krawedzi>>
 
-        //lista metod musi byc juz wczesniej gotowa :O dltego tzreba wywolywac wczesniej metod_metod
-
-
-        addListOfPackages(listOfPackages,moduleOneModuleTwoWeight, tempPackagesList);
-        addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
-        addAllEdgesMethod_PackagesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
+        addAllPackagesToList(listOfPackages,moduleOneModuleTwoWeight, tempPackagesList);
+        addPackageToPackageEdgesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
+        addMethodToPackageEdgesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
         this.allData.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
         this.allData.setListOfPackages(listOfPackages);
         this.allData.setListOfEdgesPackage_Package(listOfEdgesPackage_Package);
         this.allData.setListOfMethods(listOfMethods);
-//        System.out.println("Lista paczek:");
-//        listOfPackages.forEach(x-> System.out.println(x));
-//        System.out.println("Lista krawedzi paczka_paczka: ");
-//        listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
-//        System.out.println("Lista krawedzi metoda_paczka: ");
-//        listOfEdgesMethod_Package.forEach(x-> System.out.println(x));
 
         return moduleOneModuleTwoWeight;
     }
-    public  void addAllEdgesMethod_PackagesToList(ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package,ArrayList<Method> listOfMethods,ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> methodAndModuleWeight)
+
+    public void addAllPackagesToList(ArrayList<Package> listOfPackages, HashMap<String,HashMap<String,Integer>> hashMapHashMap,
+                                     HashMap<String, String> idMap)
+    {
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : hashMapHashMap.entrySet()) {
+            String name1=firstEntry.getKey();
+            boolean isAlreadyAtList=false;
+            for(Package p:listOfPackages){
+                if(p.getPackageName().equals(name1)) isAlreadyAtList=true;
+            }
+            if(!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name1),name1,500));
+
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                for(Package p:listOfPackages){
+                    if(p.getPackageName().equals(name2)) isAlreadyAtList=true;
+                }
+                if(!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name2), name2,500));
+
+            }
+        }
+        //listOfPackages.forEach(x-> System.out.println(x));
+
+    }
+    public void addPackageToPackageEdgesToList(ArrayList<Package> listOfPackages, ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package, HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight)
+    {
+        EdgeMethod_Package.EdgePackage_Package edgePackage_package=new EdgeMethod_Package.EdgePackage_Package();
+        Package temp1=new Package();
+        Package temp2=new Package();
+
+        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : moduleOneModuleTwoWeight.entrySet()) {
+            String name1=firstEntry.getKey();
+            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
+                String name2 = secondEntry.getKey();
+                Integer weight=secondEntry.getValue();
+                for(Package p:listOfPackages){
+                    if(p.getPackageName().equals(name1)){
+                        temp1=p;
+                    }
+                    if(p.getPackageName().equals(name2)){
+                        temp2=p;
+                    }
+                }
+                edgePackage_package=new EdgeMethod_Package.EdgePackage_Package(temp1,temp2,weight);
+                if(!listOfEdgesPackage_Package.contains(edgePackage_package)) listOfEdgesPackage_Package.add(edgePackage_package);
+
+            }
+        }
+        // listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
+    }
+
+    public  void addMethodToPackageEdgesToList(ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package, ArrayList<Method> listOfMethods, ArrayList<Package> listOfPackages, HashMap<String,HashMap<String,Integer>> methodAndModuleWeight)
     {
         EdgeMethod_Package edgeMethod_package=new EdgeMethod_Package();
         Method temp1=new Method();
@@ -451,186 +568,16 @@ public class DataGuide {
         //  listOfEdgesMethod_Package.forEach(x-> System.out.println(x));
 
     }
-    public void addAllEdgesPackage_PackagesToList(ArrayList<Package> listOfPackages, ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package, HashMap<String,HashMap<String,Integer>> moduleOneModuleTwoWeight)
-    {
-        EdgeMethod_Package.EdgePackage_Package edgePackage_package=new EdgeMethod_Package.EdgePackage_Package();
-        Package temp1=new Package();
-        Package temp2=new Package();
 
-        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : moduleOneModuleTwoWeight.entrySet()) {
-            String name1=firstEntry.getKey();
-            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
-                String name2 = secondEntry.getKey();
-                Integer weight=secondEntry.getValue();
-                for(Package p:listOfPackages){
-                    if(p.getPackageName().equals(name1)){
-                        temp1=p;
-                    }
-                    if(p.getPackageName().equals(name2)){
-                        temp2=p;
-                    }
-                }
-                edgePackage_package=new EdgeMethod_Package.EdgePackage_Package(temp1,temp2,weight);
-                if(!listOfEdgesPackage_Package.contains(edgePackage_package)) listOfEdgesPackage_Package.add(edgePackage_package);
-
-            }
-        }
-        // listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
-    }
-    public void addListOfPackages(ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> hashMapHashMap,
-                                  HashMap<String, String> idMap)
-    {
-        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : hashMapHashMap.entrySet()) {
-            String name1=firstEntry.getKey();
-            boolean isAlreadyAtList=false;
-            for(Package p:listOfPackages){
-                if(p.getPackageName().equals(name1)) isAlreadyAtList=true;
-            }
-            if(!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name1),name1,500));
-
-            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
-                String name2 = secondEntry.getKey();
-                for(Package p:listOfPackages){
-                    if(p.getPackageName().equals(name2)) isAlreadyAtList=true;
-                }
-                if(!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name2), name2,500));
-
-            }
-        }
-        //listOfPackages.forEach(x-> System.out.println(x));
-
-    }
-
-
-    private void checkDirectory(File file, Set<File> list) {
-        if (file.isDirectory()) {
-            Arrays.stream(file.listFiles()).forEach(file2 -> {
-                if (file2.isDirectory()) {
-                    checkDirectory(file2, list);
-                } else {
-                    list.add(file2);
-                }
-            });
-        } else {
-            list.add(file);
-        }
-    }
-
-    public ArrayList<Method> addMethodsToList(ArrayList<Method> methodsList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight,HashMap<String,String> tempListOfMethods) {
-        boolean isAlreadyAtList=false;
-
-        for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
-            String methodName = entry.getKey();
-            String pathToMethod=tempListOfMethods.get(methodName);
-            Method method = new Method(pathToMethod, methodName);
-            for(Method m:methodsList){
-                if(m.getMethodName().equals(entry.getKey()))
-                {
-                    isAlreadyAtList=true;
-                }
-            }
-            if(!isAlreadyAtList){
-                methodsList.add(method);
-            }
-            isAlreadyAtList=false;
-            Map<String, Integer> temp = entry.getValue();
-            for (Map.Entry<String, Integer> entr : temp.entrySet()) {
-                String methodName1 = entr.getKey();
-                pathToMethod=tempListOfMethods.get(methodName1);
-                Method method1 = new Method(pathToMethod, methodName1);
-                for(Method m:methodsList){
-                    if(m.getMethodName().equals(entr.getKey()))
-                    {
-                        isAlreadyAtList=true;
-                    }
-                }
-                if(!isAlreadyAtList) {
-                    methodsList.add(method1);
-                }
-            }
-            isAlreadyAtList=false;
-        }
-
-
-        for (Method m : methodsList) {
-           // System.out.println(m);
-        }
-        return methodsList;
-    }
-
-    public void addMethodsEdgesToList(ArrayList<EdgeMethod_Method> methodsEdgesList, HashMap<String, HashMap<String, Integer>> methodOneMethodTwoWeight,ArrayList<Method> methodsList) {
-
-//        for (Map.Entry<String, HashMap<String, Integer>> entry : methodOneMethodTwoWeight.entrySet()) {
-//            Method methodFrom = new Method();
-//            for(int i=0;i<methodsList.size();i++)
-//            {
-//                if(methodsList.get(i).getMethodName().equals(entry.getKey()))
-//                {
-//                    methodFrom=methodsList.get(i);
-//                }
-//            }
-//            // methodFrom.setMethodName(entry.getKey());
-//            Map<String, Integer> temp = entry.getValue();
-//            for (Map.Entry<String, Integer> entr : temp.entrySet()) {
-//                Method methodTo=new Method();
-//                int edgeWeight;
-//                for(int i=0;i<methodsList.size();i++)
-//                {
-//                    if(methodsList.get(i).getMethodName().equals(entr.getKey()))
-//                    {
-//                        methodTo=methodsList.get(i);
-//                    }
-//                }
-//                //methodTo.setMethodName(entr.getKey());
-//                edgeWeight=entr.getValue();
-//                EdgeMethod_Method edge=new EdgeMethod_Method(methodFrom,methodTo,edgeWeight);
-//                methodsEdgesList.add(edge);
-//            }
-//
-//        }
-//        for(EdgeMethod_Method emm:methodsEdgesList){
-//           // System.out.println(emm);
-//        }
-        EdgeMethod_Method edgeMethod_method=new EdgeMethod_Method();
-        Method temp1=new Method();
-        Method temp2=new Method();
-        for (Map.Entry<String, HashMap<String, Integer>> firstEntry : methodOneMethodTwoWeight.entrySet()) {
-            String name1=firstEntry.getKey();
-            for(Method method:methodsList) {
-                if (method.getMethodName().equals(name1)) {
-                    temp1 = method;
-                    temp1.setId(method.getId());
-                }
-            }
-
-            for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
-                String name2 = secondEntry.getKey();
-                Integer weight = secondEntry.getValue();
-                for (Method method : methodsList) {
-                    if (method.getMethodName().equals(name2)) {
-                        temp2 = method;
-                        temp2.setId(method.getId());
-                    }
-                }
-                edgeMethod_method = new EdgeMethod_Method(temp1, temp2, weight);
-                // System.out.println(edgeFile_file);
-                if (!methodsEdgesList.contains(edgeMethod_method)) methodsEdgesList.add(edgeMethod_method);
-            }
-
-
-        }
-
-    }
-
+    //-------------------------------------------------------------------------------------------------------------------------------
     // Historyjka 6
-    // Połczenia Metoda -> Plik
-    // methodAndFile return hashMap<String fileName, Set<String methods>>
-
-    public HashMap<String,Set<String>> methodFileConnections(){
+    // Połczenia pomiędzy metodami, a plikami /file_method
+    public HashMap<String,Set<String>> methodToFileConnection(){
 
         ArrayList<JavaFile> listOfJavaFiles = new ArrayList<>();
         ArrayList<Method> listOfDefinedMethods = new ArrayList<>();
         ArrayList<EdgeMethod_File> listOfMethodFileEdges = new ArrayList<>();
+        HashMap<String,String> tempMapOfMethodPath=new HashMap<>();
         addAllFilesToList(listOfJavaFiles);
 
         classesFiles.forEach(file -> {
@@ -644,6 +591,7 @@ public class DataGuide {
             for (MethodDeclaration md : cu.findAll(MethodDeclaration.class)) {
 
                 HashMap<String, Integer> methodTwoAndWeight = new HashMap<>();
+                tempMapOfMethodPath.put(md.resolve().getName(),file.getPath()+"\\"+md.resolve().getName());
                 methodsInSpecificFile.add(md.resolve().getName());
             }
             if(!methodsInSpecificFile.isEmpty()){
@@ -651,12 +599,12 @@ public class DataGuide {
             }
         });
 
-        createListOfDefinedMethods(listOfDefinedMethods,methodAndFile);
-        createMethodFileEdges(listOfJavaFiles,listOfDefinedMethods,listOfMethodFileEdges,methodAndFile);
+        addAllDefinedMethodToList(listOfDefinedMethods,methodAndFile,tempMapOfMethodPath);
+        addMethodToFileEdgesToList(listOfJavaFiles,listOfDefinedMethods,listOfMethodFileEdges,methodAndFile);
         return methodAndFile;
     }
 
-    public void createListOfDefinedMethods(ArrayList<Method> listOfDefinedMethods, HashMap<String, Set<String>> methodAndFile){
+    public void addAllDefinedMethodToList(ArrayList<Method> listOfDefinedMethods, HashMap<String, Set<String>> methodAndFile, HashMap<String,String> tempMapOfMethodPath){
 
         boolean isAlreadyAtList=false;
 
@@ -664,7 +612,7 @@ public class DataGuide {
             Set<String> tmp = entry.getValue();
 
             for(String methodName: tmp){
-                Method method = new Method(CommonUtils.randomId(), methodName,1);
+                Method method = new Method(tempMapOfMethodPath.get(methodName),methodName,1);
                 listOfDefinedMethods.add(method);
                 //System.out.println(listOfDefinedMethods);
             }
@@ -673,10 +621,10 @@ public class DataGuide {
 
     }
 
-    public void createMethodFileEdges(ArrayList<JavaFile> listOfJavaFiles, ArrayList<Method> listOfMethods, ArrayList<EdgeMethod_File> edgeMethodFiles, HashMap<String, Set<String>> methodAndFile) {
+    public void addMethodToFileEdgesToList(ArrayList<JavaFile> listOfJavaFiles, ArrayList<Method> listOfMethods, ArrayList<EdgeMethod_File> edgeMethodFiles, HashMap<String, Set<String>> methodAndFile) {
         Method method = new Method();
         JavaFile javaFile = new JavaFile();
-        EdgeMethod_File emf = new EdgeMethod_File();
+        EdgeMethod_File emf = null;
         //System.out.println("pliki: ");
         for (Map.Entry<String, Set<String>> entry : methodAndFile.entrySet()) {
 
@@ -688,34 +636,47 @@ public class DataGuide {
                 }
 
             }
-               // for (String ms : listOfMethods) {
+            Set<String> methodSet = entry.getValue();
+            for (String ms : methodSet) {
 
-                    //System.out.println(ms);
-                    for (Method m : listOfMethods) {
-                        //System.out.println(m.getMethodName());
-                        if (m.getMethodName().equals(entry.getValue())) {
-                            method = m;
-                        }
+                //System.out.println(ms);
+                for (Method m : listOfMethods) {
+                    //System.out.println(m.getMethodName());
+                    if (m.getMethodName().equals(ms)) {
+                        method = m;
+                        emf = new EdgeMethod_File(method, javaFile);
                     }
-                    emf = new EdgeMethod_File(method, javaFile);
+                }
 
-                    if (!edgeMethodFiles.contains(emf)) {
-                        edgeMethodFiles.add(emf);
-                    }
+                if (!edgeMethodFiles.contains(emf)) {
+                    edgeMethodFiles.add(emf);
+                }
 
-
-
+            }
 
 
         }
-        for (EdgeMethod_File em : edgeMethodFiles) {
-            System.out.println(em.toString());
-        }
-        allData.getListOfEdgesMethod_File().addAll(edgeMethodFiles);
+        allData.listOfEdgesMethod_File.addAll(edgeMethodFiles);
+//        for (EdgeMethod_File em : edgeMethodFiles) {
+//            System.out.println(em.toString());
+//        }
     }
 
-    public static String getPath() {
-        return path;
+    //-----------------------------------------------------------------------------------------------------------------------------------------
+
+    //funkcje pomocnicze =)
+    private void checkDirectory(File file, Set<File> list) {
+        if (file.isDirectory()) {
+            Arrays.stream(file.listFiles()).forEach(file2 -> {
+                if (file2.isDirectory()) {
+                    checkDirectory(file2, list);
+                } else {
+                    list.add(file2);
+                }
+            });
+        } else {
+            list.add(file);
+        }
     }
 
     public static void setPath(String path) {

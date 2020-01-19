@@ -57,6 +57,7 @@ public class Method {
     @Override
     public String toString() {
         return "Method{" +
+                "id="+ id+'\''+
                 "methodName='" + methodName + '\'' +
                 ", circleSize=" + circleSize +
                 '}';

@@ -4,11 +4,9 @@ import Data.DataGuide;
 import Data.JavaFile;
 import Export.XMLFileBuilder;
 import com.jamesmurty.utils.XMLBuilder2;
-import javassist.NotFoundException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -22,7 +20,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.FilesConnections();
+        dataGuide.fileToFileConnection();
         Assert.assertFalse(allData.listOfJavaFiles.isEmpty());
     }
 
@@ -31,7 +29,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.FilesConnections();
+        dataGuide.fileToFileConnection();
         Assert.assertFalse(allData.listOfEdgesFile_File.isEmpty());
     }
     @Test
@@ -39,7 +37,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.methodFileConnections();
+        dataGuide.methodToFileConnection();
         Assert.assertFalse(allData.listOfEdgesMethod_File.isEmpty());
     }
     @Test
@@ -47,7 +45,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
+        dataGuide.packageToPackageConnection();
         Assert.assertFalse(allData.listOfEdgesPackage_Package.isEmpty());
     }
 
@@ -67,7 +65,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.MethodConnections();
+        dataGuide.methodToMethodConnection();
         Assert.assertFalse(allData.listOfEdgesMethod_Method.isEmpty());
 
     }
@@ -78,7 +76,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
+        dataGuide.packageToPackageConnection();
         Assert.assertFalse(allData.listOfEdgesPackage_Package.isEmpty());
 
     }
@@ -87,7 +85,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
+        dataGuide.packageToPackageConnection();
         Assert.assertFalse(allData.listOfEdgesMethod_Package.isEmpty());
 
     }
@@ -96,7 +94,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
+        dataGuide.packageToPackageConnection();
         Assert.assertFalse(allData.listOfPackages.isEmpty());
 
     }
@@ -118,7 +116,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
+        dataGuide.packageToPackageConnection();
         Assert.assertFalse(allData.listOfEdgesMethod_Package.isEmpty());
     }
 
@@ -127,7 +125,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.MethodConnections();
+        dataGuide.methodToMethodConnection();
         Assert.assertFalse(allData.listOfMethods.isEmpty());
     }
      @Test
@@ -135,7 +133,7 @@ class ProgramTest {
          AllData allData = new AllData();
          DataGuide dataGuide = new DataGuide();
          dataGuide.findModuleDependencies(allData);
-         dataGuide.FilesConnections();
+         dataGuide.fileToFileConnection();
          for (JavaFile file:allData.listOfJavaFiles
               ) {
              Assert.assertNotNull(file.getJavaFileName());
@@ -149,7 +147,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.FilesConnections();
+        dataGuide.fileToFileConnection();
         XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
         xmlFileBuilder.addElements(dataGuide.getFileOneFileTwoWeight());
         XMLBuilder2 builderOne = xmlFileBuilder.getBuilder();
@@ -163,7 +161,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.MethodConnections();
+        dataGuide.methodToMethodConnection();
         XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
         xmlFileBuilder.addElements(dataGuide.getMethodOneMethodTwoWeight());
         XMLBuilder2 builderTwo = xmlFileBuilder.getBuilder();
@@ -177,7 +175,7 @@ class ProgramTest {
         AllData allData = new AllData();
         DataGuide dataGuide = new DataGuide();
         dataGuide.findModuleDependencies(allData);
-        dataGuide.ModuleConnections();
+        dataGuide.packageToPackageConnection();
         XMLFileBuilder xmlFileBuilder = new XMLFileBuilder();
         xmlFileBuilder.addElements(dataGuide.getModuleOneModuleTwoWeight());
         XMLBuilder2 builderThree = xmlFileBuilder.getBuilder();

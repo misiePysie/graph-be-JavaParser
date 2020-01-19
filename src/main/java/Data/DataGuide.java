@@ -500,14 +500,14 @@ public class DataGuide {
             for (Package p : listOfPackages) {
                 if (p.getPackageName().equals(name1)) isAlreadyAtList = true;
             }
-            if (!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name1), name1, 500));
+            if (!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name1), name1, 150));
 
             for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
                 String name2 = secondEntry.getKey();
                 for (Package p : listOfPackages) {
                     if (p.getPackageName().equals(name2)) isAlreadyAtList = true;
                 }
-                if (!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name2), name2, 500));
+                if (!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name2), name2, 150));
 
             }
         }
@@ -683,10 +683,10 @@ public class DataGuide {
     }
 
 //historyjka 9
-    public void getCommitHash() throws IOException {
+    public String getCommitHash() throws IOException {
 
-        String home = System.getProperty("user.home");
-        String repositoryPath = home +File.separator + "graph-be-JavaParser"+File.separator+".git";
+        String home = System.getProperty("user.dir");
+        String repositoryPath = home + File.separator+".git";
 
         Repository currentRepository = new FileRepositoryBuilder()
                 .setGitDir(new File(repositoryPath))
@@ -694,7 +694,7 @@ public class DataGuide {
 
         Ref headCommitHash = currentRepository.getAllRefs().get("HEAD");
         commitHash = headCommitHash.getObjectId().getName();
-        System.out.println(headCommitHash.getName() + " - " + headCommitHash.getObjectId().getName());
+        return headCommitHash.getName() + " - " + headCommitHash.getObjectId().getName();
 
     }
 

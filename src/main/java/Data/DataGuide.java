@@ -75,6 +75,7 @@ public class DataGuide {
         combinedTypeSolver.add(new JarTypeSolver("jar/spring-core-5.2.2.RELEASE.jar"));
         combinedTypeSolver.add(new JarTypeSolver("jar/spring-web-5.2.2.RELEASE.jar"));
         combinedTypeSolver.add(new JarTypeSolver("jar/guava-28.2-jre.jar"));
+        combinedTypeSolver.add(new JarTypeSolver("jar/org.eclipse.jgit-5.6.0.201912101111-r.jar"));
 
         this.javaSymbolSolver = new JavaSymbolSolver(combinedTypeSolver);
         StaticJavaParser.getConfiguration().setSymbolResolver(javaSymbolSolver);

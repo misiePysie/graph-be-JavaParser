@@ -291,6 +291,18 @@ public class GraphApplicationController {
         return new ResponseEntity(resource, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "http://localhost:8080")
+    @ResponseBody
+    @RequestMapping(path = "/commitHash", method = RequestMethod.GET)
+    public ResponseEntity commitHash() {
+        String test = "";
+        try {
+            test = dataSet.getCommitHash();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity(test, HttpStatus.OK);
+    }
 
 
 }

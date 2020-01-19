@@ -701,6 +701,4 @@ public class DataGuide {
     public static void setPath(String path) {
         DataGuide.path = path;
     }
-
-
 }

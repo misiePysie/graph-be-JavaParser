@@ -9,7 +9,9 @@ public class EdgeMethod_Method {
 
     public EdgeMethod_Method(Method methodFrom, Method methodTo, int weight) {
         this.methodFrom = methodFrom;
+        this.methodFrom.setId(methodFrom.getId());
         this.methodTo = methodTo;
+        this.methodTo.setId(methodTo.getId());
         this.weight = weight;
     }
 

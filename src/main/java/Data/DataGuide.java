@@ -313,6 +313,8 @@ public class DataGuide {
         ArrayList<EdgeMethod_Package.EdgePackage_Package> listOfEdgesPackage_Package=new ArrayList<>();
         final ArrayList<Method> listOfMethods=new ArrayList<>();
         ArrayList<EdgeMethod_Package> listOfEdgesMethod_Package=new ArrayList<>();
+        HashMap<String,String> tempPackagesList = new HashMap<>();
+
         // addListOfPackages(listOfPackages);
         int iter=0;
 
@@ -354,6 +356,7 @@ public class DataGuide {
             HashMap<String,Integer> methodTwoAndWeightSecond = new HashMap<>();
             for(MethodDeclaration md : cu.findAll(MethodDeclaration.class)){
                 for(MethodCallExpr mce : md.findAll(MethodCallExpr.class)){
+                    tempPackagesList.put(md.resolve().getPackageName(), file.getParent());
                     if(classesNames.contains(mce.resolve().getClassName())){
                         if(!moduleTwoAndWeight.containsKey(mce.resolve().getPackageName())){
                             moduleTwoAndWeight.put(mce.resolve().getPackageName(),1);
@@ -403,7 +406,7 @@ public class DataGuide {
         //lista metod musi byc juz wczesniej gotowa :O dltego tzreba wywolywac wczesniej metod_metod
 
 
-        addListOfPackages(listOfPackages,moduleOneModuleTwoWeight);
+        addListOfPackages(listOfPackages,moduleOneModuleTwoWeight, tempPackagesList);
         addAllEdgesPackage_PackagesToList(listOfPackages,listOfEdgesPackage_Package,moduleOneModuleTwoWeight);
         addAllEdgesMethod_PackagesToList(listOfEdgesMethod_Package,listOfMethods,listOfPackages,methodAndModuleWeight);
         this.allData.setListOfEdgesMethod_Package(listOfEdgesMethod_Package);
@@ -474,7 +477,8 @@ public class DataGuide {
         }
         // listOfEdgesPackage_Package.forEach(x-> System.out.println(x));
     }
-    public void addListOfPackages(ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> hashMapHashMap)
+    public void addListOfPackages(ArrayList<Package> listOfPackages,HashMap<String,HashMap<String,Integer>> hashMapHashMap,
+                                  HashMap<String, String> idMap)
     {
         for (Map.Entry<String, HashMap<String, Integer>> firstEntry : hashMapHashMap.entrySet()) {
             String name1=firstEntry.getKey();
@@ -482,14 +486,14 @@ public class DataGuide {
             for(Package p:listOfPackages){
                 if(p.getPackageName().equals(name1)) isAlreadyAtList=true;
             }
-            if(!isAlreadyAtList) listOfPackages.add(new Package(CommonUtils.randomId(),name1,500));
+            if(!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name1),name1,500));
 
             for (Map.Entry<String, Integer> secondEntry : firstEntry.getValue().entrySet()) {
                 String name2 = secondEntry.getKey();
                 for(Package p:listOfPackages){
                     if(p.getPackageName().equals(name2)) isAlreadyAtList=true;
                 }
-                if(!isAlreadyAtList) listOfPackages.add(new Package(CommonUtils.randomId(), name2,500));
+                if(!isAlreadyAtList) listOfPackages.add(new Package(idMap.get(name2), name2,500));
 
             }
         }
@@ -595,6 +599,7 @@ public class DataGuide {
             for(Method method:methodsList) {
                 if (method.getMethodName().equals(name1)) {
                     temp1 = method;
+                    temp1.setId(method.getId());
                 }
             }
 
@@ -604,6 +609,7 @@ public class DataGuide {
                 for (Method method : methodsList) {
                     if (method.getMethodName().equals(name2)) {
                         temp2 = method;
+                        temp2.setId(method.getId());
                     }
                 }
                 edgeMethod_method = new EdgeMethod_Method(temp1, temp2, weight);

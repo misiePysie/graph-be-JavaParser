@@ -265,7 +265,7 @@ public class DataGuide {
                 e.printStackTrace();
             }
             for (MethodDeclaration md : cu.findAll(MethodDeclaration.class)) {
-                tempListOfMethod.put(md.resolve().getName(),file.getPath());
+                tempListOfMethod.put(md.resolve().getName(),file.getPath() + "\\" + md.resolve().getName());
                 HashMap<String, Integer> methodTwoAndWeight = new HashMap<>();
                 for (MethodCallExpr mce : md.findAll(MethodCallExpr.class)) {
                     if (classesNames.contains(mce.resolve().getClassName())) {

@@ -18,6 +18,8 @@ public class GraphApplication {
 
     public static void main (String args[]) throws IOException, NoSuchFieldException, ClassNotFoundException, UnsolvedSymbolException {
         SpringApplication.run(GraphApplication.class, args);
+//        DataGuide dg = new DataGuide();
+//        dg.getCommitHash();
 //        AllData allData = new AllData();
 //        DataGuide dataGuide = new DataGuide();
 //        dataGuide.findModuleDependencies(allData);
